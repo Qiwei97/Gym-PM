@@ -36,7 +36,7 @@ class PM_Env(gym.Env):
 
         self.timer = time.time()
         self.machine_a = Machine(output_rate=1, param=10)
-        self.machine_b = Machine(output_rate=2, param=15)
+        self.machine_b = Machine(output_rate=1, param=15)
         self.machines = [self.machine_a, self.machine_b]
 
         return self.observation()
@@ -78,7 +78,7 @@ class PM_Env(gym.Env):
 
     def check_done(self):
 
-        if np.sum([machine.capacity for machine in self.machines]) == 0:
+        if np.sum([machine.capacity for machine in self.machines]) <= 0:
             done = True
         else:
             done = False
