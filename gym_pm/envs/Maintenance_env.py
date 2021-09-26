@@ -3,7 +3,7 @@ from gym import spaces
 import time
 import numpy as np
 import pandas as pd
-from Objects import Machine
+from gym_pm.envs.Objects import Machine
 from IPython.display import display, clear_output
 
 class PM_Env(gym.Env):
