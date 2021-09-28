@@ -130,3 +130,6 @@ class PM_Env(gym.Env):
             clear_output(wait=True)
             display(result)
             time.sleep(1)
+
+    def close(self):
+        pass
