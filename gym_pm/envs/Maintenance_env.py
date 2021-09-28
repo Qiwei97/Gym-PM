@@ -15,8 +15,8 @@ class PM_Env(gym.Env):
         self.timer = time.time()
 
         # Prepare Game Objects
-        self.machine_a = Machine(output_rate=1, param=10)
-        self.machine_b = Machine(output_rate=1, param=15)
+        self.machine_a = Machine(output_rate=1, param=5)
+        self.machine_b = Machine(output_rate=1, param=3)
         self.machines = [self.machine_a, self.machine_b]
 
         self.max_duration = 30
@@ -35,8 +35,8 @@ class PM_Env(gym.Env):
     def reset(self):
 
         self.timer = time.time()
-        self.machine_a = Machine(output_rate=1, param=10)
-        self.machine_b = Machine(output_rate=1, param=15)
+        self.machine_a = Machine(output_rate=1, param=5)
+        self.machine_b = Machine(output_rate=1, param=3)
         self.machines = [self.machine_a, self.machine_b]
 
         return self.observation()
@@ -70,7 +70,7 @@ class PM_Env(gym.Env):
 
         reward = 100
         for machine in self.machines:
-            reward -= machine.repair_cost * machine.repair_status
+            reward -= machine.repair_cost * machine.repair_status * machine.repair_time
             if machine.working == False:
                 reward -= 120
 

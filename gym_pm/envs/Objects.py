@@ -25,6 +25,7 @@ class Machine:
         self.output = 0
         self.product_price = product_price
         self.output_rate = output_rate
+        self.repair_time = 0
 
         # weibull
         self.param = param
@@ -61,9 +62,9 @@ class Machine:
     def repair(self, now):
 
         # Random fault types
-        repair_time = np.random.randint(low=2, high=5)
+        self.repair_time = np.random.randint(low=2, high=5)
         
-        self.downtime += repair_time
+        self.downtime += self.repair_time
         self.repair_counter += 1
         self.working = 1
         self.ref_age = now
