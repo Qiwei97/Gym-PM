@@ -9,14 +9,14 @@ from IPython.display import display, clear_output
 class PM_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
-    def __init__(self):
+    def __init__(self, env_config=None):
 
         # Initialize Everything
         self.timer = time.time()
 
         # Prepare Game Objects
-        self.machine_a = Machine(output_rate=1, param=5)
-        self.machine_b = Machine(output_rate=1, param=3)
+        self.machine_a = Machine(output_rate=1, param=10)
+        self.machine_b = Machine(output_rate=1, param=15)
         self.machines = [self.machine_a, self.machine_b]
 
         self.max_duration = 30
@@ -35,8 +35,8 @@ class PM_Env(gym.Env):
     def reset(self):
 
         self.timer = time.time()
-        self.machine_a = Machine(output_rate=1, param=5)
-        self.machine_b = Machine(output_rate=1, param=3)
+        self.machine_a = Machine(output_rate=1, param=10)
+        self.machine_b = Machine(output_rate=1, param=15)
         self.machines = [self.machine_a, self.machine_b]
 
         return self.observation()
