@@ -1,72 +1,58 @@
 # Import Modules
-import time
 import numpy as np
+from reliability.Distributions import Weibull_Distribution
 
 class Machine:
 
-    def __init__(self, output_rate, param, repair_cost=30, resupply_cost=5, product_price=3):
+    def __init__(self, output_rate, alpha, repair_cost=30, resupply_cost=5, product_price=3):
 
-        self.capacity = 25
+        self.capacity = 100
         self.working = 1
-        self.age = 0
-        self.fail_prob = 0
-        self.repair_counter = 0
-        self.repair_status = 0
 
-        start = time.time()
-        self.inv_time = start
-        self.det_time = start
-        self.ref_age = start
-
-        # cost elements
+        # Cost elements
         self.repair_cost = repair_cost
         self.resupply_cost = resupply_cost
-        self.downtime = 0
-        self.output = 0
         self.product_price = product_price
         self.output_rate = output_rate
-        self.repair_time = 0
 
-        # weibull
-        self.param = param
+        self.age = 0
+        self.repair_counter = 0
+        self.repair_time = 0
+        self.repair_status = 0
+
+        # Survival
+        self.reliability_dist = Weibull_Distribution(alpha=alpha, beta=5)
+        self.survival_prob = 1
+        self.ttf = np.round(self.reliability_dist.random_samples(1)) # Time to failure
     
     # Resource Usage
-    def update_inv(self, now):
+    def update_inv(self):
 
         if self.capacity == 0:
             return
 
         if self.working:
-            interval = now - self.inv_time
-            if interval >= 1: # Update every second
-                self.capacity -= self.output_rate
-                self.output += self.output_rate
-                self.inv_time = now
+            self.capacity -= self.output_rate
 
     # Deterioration
-    def failure_sampling(self, now, sampling_time=1, b=5):
+    def failure_check(self):
 
-        def weibull(a, b, x):
-            return 1 - np.e ** -((x / a) ** b)
+        # Break down
+        if self.age >= self.ttf:
+            self.working = 0
+            return
         
-        interval = now - self.det_time
-        if interval >= sampling_time:
-            self.det_time = now
-            if self.working and self.capacity > 0:
-                self.age = now - self.ref_age
-                self.fail_prob = weibull(self.param, b, self.age)
-                self.working = 1 - np.random.binomial(1, self.fail_prob)
-            else:
-                self.downtime += sampling_time # if dont repair immediately + stock out time
-             
-    def repair(self, now):
+        if self.working and self.capacity > 0:
+            self.age += 1
+            self.survival_prob = self.reliability_dist.SF(self.age)
+            
+    def repair(self):
 
         # Random fault types
         self.repair_time = np.random.randint(low=2, high=5)
         
-        self.downtime += self.repair_time
+        self.ttf = np.round(self.reliability_dist.random_samples(1)) # Time to failure
         self.repair_counter += 1
         self.working = 1
-        self.ref_age = now
         self.age = 0
         self.repair_status = 1
