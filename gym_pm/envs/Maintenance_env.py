@@ -123,9 +123,10 @@ class PM_Env(gym.Env):
             result['age'] = result['age'].astype(int)
             result.condition = result.condition.astype(bool)
             result.resources = result.resources.astype(float).round(2)
-            result['time'] = int(self.time_step)
+            result['ttf'] = [machine.ttf for machine in self.machines]
             result['repair_count'] = [machine.repair_counter for machine in self.machines]
             result['reward'] = self.get_reward()
+            result['time'] = int(self.time_step)
             
             clear_output(wait=True)
             display(result)
