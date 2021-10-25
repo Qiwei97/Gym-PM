@@ -50,7 +50,7 @@ class Factory:
     def __init__(self, output_rate, alpha, 
                  repair_cost=30, resupply_cost=3, 
                  storage_cost=2, resupply_qty=10, 
-                 lead_time=3, product_price=5):
+                 lead_time=3, product_price=100):
 
         self.capacity = 20
         self.working = 1
