@@ -7,3 +7,8 @@ register(
     id='Rail-v0',
     entry_point='gym_pm.envs:Rail_Env'
 )
+
+register(
+    id='Assembly-v0',
+    entry_point='gym_pm.envs:Assembly_Env'
+)
