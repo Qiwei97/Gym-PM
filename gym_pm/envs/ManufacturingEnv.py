@@ -16,7 +16,7 @@ class Assembly_Env(gym.Env):
 
         # Episode length
         self.max_duration = 60 # max timestep
-        self.max_resource = 100
+        self.max_resource = 1000 # Set to a high value
 
         # action space
         self.action_space = spaces.Discrete(4 * len(self.machines) - 1)
