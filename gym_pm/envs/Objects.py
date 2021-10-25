@@ -47,13 +47,14 @@ class Train:
 
 class Factory:
 
-    def __init__(self, output_rate, alpha, 
+    def __init__(self, output_rate, alpha, episode_length,
                  repair_cost=30, resupply_cost=3, 
                  storage_cost=2, resupply_qty=10, 
                  lead_time=3, product_price=75):
 
         self.capacity = 20
         self.working = 1
+        self.output = 0
 
         # Cost elements
         self.repair_cost = repair_cost
@@ -70,13 +71,17 @@ class Factory:
         self.repair_status = 0
         self.resupply_status = 0
 
-        # Lead Time Countdown
-        self.order_list = np.array([])
+        # List of Lead Time for Countdown
+        self.resupply_list = np.array([])
 
         # Survival
         self.reliability_dist = Weibull_Distribution(alpha=alpha, beta=5)
         self.survival_prob = 1
         self.ttf = np.round(self.reliability_dist.random_samples(1)) # Time to failure
+
+        # Demand
+        self.demand_dist = np.random.poisson(2, episode_length)
+        self.fulfilled_orders = 0
     
     # Resource Usage
     def update_inv(self):
@@ -86,6 +91,7 @@ class Factory:
 
         if self.working:
             self.capacity -= self.output_rate
+            self.output += self.output_rate
 
     # Deterioration
     def failure_check(self):
@@ -102,11 +108,11 @@ class Factory:
     # Update Lead time 
     def update_LT(self):
 
-        if len(self.order_list) > 0:
-            self.order_list -= 1 # Count down
+        if len(self.resupply_list) > 0:
+            self.resupply_list -= 1 # Count down
             # Replenish Stock
-            self.capacity += self.resupply_qty * sum(self.order_list <= 0)
-            self.order_list = self.order_list[self.order_list > 0]
+            self.capacity += self.resupply_qty * sum(self.resupply_list <= 0)
+            self.resupply_list = self.resupply_list[self.resupply_list > 0]
 
     def repair(self):
 
@@ -121,7 +127,6 @@ class Factory:
 
     def resupply(self):
 
-        # Send orders
-        self.order_list = np.append(self.order_list, self.lead_time)
+        # Send resupply orders
+        self.resupply_list = np.append(self.resupply_list, self.lead_time)
         self.resupply_status = 1
-

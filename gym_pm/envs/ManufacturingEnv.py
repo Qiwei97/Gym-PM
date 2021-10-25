@@ -11,33 +11,35 @@ class Assembly_Env(gym.Env):
 
     def __init__(self, env_config=None):
 
+        # Episode length
+        self.episode_length = 100 # max timestep
+        self.max_resource = 1000 # Set to a high value
+
         # Initialize everything
         self.reset()
-
-        # Episode length
-        self.max_duration = 100 # max timestep
-        self.max_resource = 1000 # Set to a high value
 
         # action space
         self.action_space = spaces.Discrete(4 * len(self.machines) - 1)
         # obs space
         self.observation_space = spaces.Dict({
-                "age": spaces.Box(low=0., high=self.max_duration, shape=(len(self.machines),), dtype=np.float32),
+                "age": spaces.Box(low=0., high=self.episode_length, shape=(len(self.machines),), dtype=np.float32),
                 "condition": spaces.MultiBinary(len(self.machines)),
                 "resources": spaces.Box(low=0., high=self.max_resource, shape=(len(self.machines),), dtype=np.float32),
-                "survival_prob": spaces.Box(low=0., high=1., shape=(len(self.machines),), dtype=np.float32)
+                "survival_prob": spaces.Box(low=0., high=1., shape=(len(self.machines),), dtype=np.float32),
+                "demand": spaces.Box(low=0., high=self.max_resource, shape=(1,), dtype=np.float32)
                 })
 
     def reset(self):
 
         # reset time_step
         self.time_step = 0
+        # reset demand
+        self.demand = 0
 
         # Prepare Objects (Add more objects as desired)
-        # We use 2 in this example
-        self.machine_a = Factory(output_rate=1, alpha=10)
-        self.machine_b = Factory(output_rate=1, alpha=15)
-        self.machines = [self.machine_a, self.machine_b]
+        # We use 1 in this example
+        self.machine_a = Factory(output_rate=1, alpha=10, episode_length=self.episode_length)
+        self.machines = [self.machine_a]
 
         return self.observation()
 
@@ -47,7 +49,8 @@ class Assembly_Env(gym.Env):
             "age": [],
             "condition": [],
             "resources": [],
-            "survival_prob": []
+            "survival_prob": [],
+            "demand": [self.demand]
         }
 
         for machine in self.machines:
@@ -62,7 +65,7 @@ class Assembly_Env(gym.Env):
 
     def get_reward(self):
 
-        reward = 0
+        reward = 0.
         for machine in self.machines:
             # Repair Cost
             reward -= machine.repair_cost * machine.repair_status * machine.repair_time
@@ -70,21 +73,35 @@ class Assembly_Env(gym.Env):
             reward -= machine.resupply_cost * machine.resupply_status * machine.resupply_qty
             # Inventory Cost
             reward -= machine.capacity * machine.storage_cost
+            reward -= machine.output * machine.storage_cost
+            # Sales Revenue
+            reward += machine.fulfilled_orders * machine.product_price
             if machine.working == False:
                 reward -= 100
-            elif machine.capacity > 0:
-                reward += machine.output_rate * machine.product_price # Sales Revenue
 
         return reward
 
     def check_done(self):
 
-        if self.time_step >= self.max_duration:
+        if self.time_step >= self.episode_length:
             done = True
         else:
             done = False
 
         return done
+
+    def get_demand(self, machine):
+
+        self.demand += machine.demand_dist[self.time_step]
+
+        if self.demand > machine.output:
+            self.demand -= machine.output
+            machine.fulfilled_orders = machine.output
+            machine.output = 0
+        else:
+            machine.output -= self.demand 
+            machine.fulfilled_orders = self.demand
+            self.demand = 0
 
     def step(self, action):
 
@@ -97,6 +114,8 @@ class Assembly_Env(gym.Env):
             machine.failure_check()
             # Inventory 
             machine.update_inv()
+            # Fulfil Demand
+            self.get_demand(machine)
             # Reset Status
             machine.repair_status = 0
             machine.repair_status = 0
@@ -105,18 +124,8 @@ class Assembly_Env(gym.Env):
         if action == 0:
             self.machine_a.repair()
         if action == 1:
-            self.machine_b.repair()
+            self.machine_a.resupply()
         if action == 2:
-            self.machine_a.repair()
-            self.machine_b.repair()
-        if action == 3:
-            self.machine_a.resupply()
-        if action == 4:
-            self.machine_b.resupply()
-        if action == 5:
-            self.machine_a.resupply()
-            self.machine_b.resupply()
-        if action == 6:
             pass
 
         obs = self.observation()
@@ -137,9 +146,10 @@ class Assembly_Env(gym.Env):
             result['ttf'] = [machine.ttf[0] for machine in self.machines]
             result['repair_count'] = [machine.repair_counter for machine in self.machines]
             result['reward'] = self.get_reward()
-            result['time'] = int(self.time_step)
-            result['orders'] = [machine.order_list for machine in self.machines]
-            
+            # result['time'] = int(self.time_step)
+            result['lead_time'] = [machine.resupply_list for machine in self.machines]
+            result['demand'] = result['demand'].astype(int)
+
             clear_output(wait=True)
             display(result)
             time.sleep(1)
