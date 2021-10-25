@@ -92,7 +92,7 @@ class Assembly_Env(gym.Env):
 
     def get_demand(self, machine):
 
-        self.demand += machine.demand_dist[self.time_step]
+        self.demand += machine.demand_dist[self.time_step - 1]
 
         if self.demand > machine.output:
             self.demand -= machine.output
