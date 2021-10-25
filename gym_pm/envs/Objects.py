@@ -2,18 +2,14 @@
 import numpy as np
 from reliability.Distributions import Weibull_Distribution
 
-class Machine:
+class Train:
 
-    def __init__(self, output_rate, alpha, repair_cost=30, resupply_cost=5, product_price=3):
+    def __init__(self, alpha, repair_cost=30):
 
-        self.capacity = 100
         self.working = 1
 
         # Cost elements
         self.repair_cost = repair_cost
-        self.resupply_cost = resupply_cost
-        self.product_price = product_price
-        self.output_rate = output_rate
 
         self.age = 0
         self.repair_counter = 0
@@ -24,15 +20,6 @@ class Machine:
         self.reliability_dist = Weibull_Distribution(alpha=alpha, beta=5)
         self.survival_prob = 1
         self.ttf = np.round(self.reliability_dist.random_samples(1)) # Time to failure
-    
-    # Resource Usage
-    def update_inv(self):
-
-        if self.capacity == 0:
-            return
-
-        if self.working:
-            self.capacity -= self.output_rate
 
     # Deterioration
     def failure_check(self):
@@ -42,7 +29,7 @@ class Machine:
             self.working = 0
             return
         
-        if self.working and self.capacity > 0:
+        if self.working:
             self.age += 1
             self.survival_prob = self.reliability_dist.SF(self.age)
             
