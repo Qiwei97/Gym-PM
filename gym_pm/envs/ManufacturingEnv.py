@@ -15,7 +15,7 @@ class Assembly_Env(gym.Env):
         self.reset()
 
         # Episode length
-        self.max_duration = 60 # max timestep
+        self.max_duration = 100 # max timestep
         self.max_resource = 1000 # Set to a high value
 
         # action space
@@ -70,10 +70,10 @@ class Assembly_Env(gym.Env):
             reward -= machine.resupply_cost * machine.resupply_status * machine.resupply_qty
             # Inventory Cost
             reward -= machine.capacity * machine.storage_cost
-            if machine.working == True:
-                reward += machine.output_rate * machine.product_price # Sales Revenue
-            else:
+            if machine.working == False:
                 reward -= 100
+            elif machine.capacity > 0:
+                reward += machine.output_rate * machine.product_price # Sales Revenue
 
         return reward
 
