@@ -62,12 +62,18 @@ class Assembly_Env(gym.Env):
 
     def get_reward(self):
 
-        reward = 100
+        reward = 0
         for machine in self.machines:
+            # Repair Cost
             reward -= machine.repair_cost * machine.repair_status * machine.repair_time
+            # Resupply Cost
             reward -= machine.resupply_cost * machine.resupply_status * machine.resupply_qty
-            if machine.working == False:
-                reward -= 200
+            # Inventory Cost
+            reward -= machine.capacity * machine.storage_cost
+            if machine.working == True:
+                reward += machine.output_rate * machine.product_price # Sales Revenue
+            else:
+                reward -= 100
 
         return reward
 

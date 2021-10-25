@@ -60,6 +60,7 @@ class Rail_Env(gym.Env):
 
         reward = 100
         for machine in self.machines:
+            # Repair Cost
             reward -= machine.repair_cost * machine.repair_status * machine.repair_time
             if machine.working == False:
                 reward -= 200
