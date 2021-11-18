@@ -13,7 +13,7 @@ class Assembly_Env(gym.Env):
 
         # Episode length
         self.episode_length = 100 # max timestep
-        self.max_resource = 1000 # Set to a high value
+        self.max_resource = 10000 # Set to a high value
 
         # Initialize everything
         self.reset()
