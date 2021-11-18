@@ -26,19 +26,19 @@ class Assembly_Env(gym.Env):
                 "condition": spaces.MultiBinary(len(self.machines)),
                 "resources": spaces.Box(low=0., high=self.max_resource, shape=(len(self.machines),), dtype=np.float32),
                 "survival_prob": spaces.Box(low=0., high=1., shape=(len(self.machines),), dtype=np.float32),
-                "demand": spaces.Box(low=0., high=self.max_resource, shape=(1,), dtype=np.float32)
+                "backlog": spaces.Box(low=0., high=self.max_resource, shape=(1,), dtype=np.float32)
                 })
 
     def reset(self):
 
         # reset time_step
         self.time_step = 0
-        # reset demand
-        self.demand = 0
+        # reset backlog
+        self.backlog = 0
 
         # Prepare Objects (Add more objects as desired)
         # We use 1 in this example
-        self.machine_a = Factory(output_rate=2, alpha=10, episode_length=self.episode_length)
+        self.machine_a = Factory(output_rate=3, alpha=10, episode_length=self.episode_length)
         self.machines = [self.machine_a]
 
         return self.observation()
@@ -50,7 +50,7 @@ class Assembly_Env(gym.Env):
             "condition": [],
             "resources": [],
             "survival_prob": [],
-            "demand": [self.demand]
+            "backlog": [self.backlog]
         }
 
         for machine in self.machines:
@@ -92,16 +92,16 @@ class Assembly_Env(gym.Env):
 
     def get_demand(self, machine):
 
-        self.demand += machine.demand_dist[self.time_step - 1]
+        self.backlog += machine.demand_dist[self.time_step - 1]
 
-        if self.demand > machine.output:
-            self.demand -= machine.output
+        if self.backlog > machine.output:
+            self.backlog -= machine.output
             machine.fulfilled_orders = machine.output
             machine.output = 0
         else:
-            machine.output -= self.demand 
-            machine.fulfilled_orders = self.demand
-            self.demand = 0
+            machine.output -= self.backlog 
+            machine.fulfilled_orders = self.backlog
+            self.backlog = 0
 
     def step(self, action):
 
@@ -148,7 +148,7 @@ class Assembly_Env(gym.Env):
             result['reward'] = self.get_reward()
             # result['time'] = int(self.time_step)
             result['lead_time'] = [machine.resupply_list for machine in self.machines]
-            result['demand'] = result['demand'].astype(int)
+            result['backlog'] = result['backlog'].astype(int)
 
             clear_output(wait=True)
             display(result)
