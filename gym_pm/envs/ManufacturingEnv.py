@@ -38,7 +38,7 @@ class Assembly_Env(gym.Env):
 
         # Prepare Objects (Add more objects as desired)
         # We use 1 in this example
-        self.machine_a = Factory(output_rate=1, alpha=10, episode_length=self.episode_length)
+        self.machine_a = Factory(output_rate=2, alpha=10, episode_length=self.episode_length)
         self.machines = [self.machine_a]
 
         return self.observation()
