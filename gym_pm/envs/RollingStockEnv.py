@@ -22,8 +22,8 @@ class Rail_Env(gym.Env):
         # obs space
         self.observation_space = spaces.Dict({
                 "age": spaces.Box(low=0., high=self.max_duration, shape=(len(self.machines),), dtype=np.float32),
-                "condition": spaces.MultiBinary(len(self.machines)),
-                "survival_prob": spaces.Box(low=0., high=1., shape=(len(self.machines),), dtype=np.float32)
+                "condition": spaces.MultiBinary(len(self.machines))
+                # "survival_prob": spaces.Box(low=0., high=1., shape=(len(self.machines),), dtype=np.float32)
                 })
 
     def reset(self):
@@ -43,14 +43,14 @@ class Rail_Env(gym.Env):
 
         state = {
             "age": [],
-            "condition": [],
-            "survival_prob": []
+            "condition": []
+            # "survival_prob": []
         }
 
         for machine in self.machines:
             state['age'].append(machine.age)
             state['condition'].append(machine.working)
-            state['survival_prob'].append(machine.survival_prob)
+            # state['survival_prob'].append(machine.survival_prob)
 
         state = {i: np.array(j, dtype='float32') for (i, j) in state.items()}
 
