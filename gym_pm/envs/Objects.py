@@ -86,7 +86,7 @@ class Factory:
     # Resource Usage
     def update_inv(self):
 
-        if self.capacity <= 0:
+        if self.capacity < self.output_rate:
             return
 
         if self.working:
