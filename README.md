@@ -4,7 +4,7 @@ This is a Gym RL Environment for Predictive Maintenance.
 
 Compatible with gym-api, Stable Baselines3, RLlib.
 
-<h2>Set up</h2>
+### Set up
 
 ```
 git clone https://github.com/Qiwei97/Gym-PM.git
@@ -12,11 +12,11 @@ cd Gym-PM
 pip install -e .
 ```
 
-<h2>Environments</h2>
+### Environments
 
-<h3>Rolling Stock</h3>
+#### Rolling Stock
   * rail-v1 (Weibull)
   * rail-v2 (Synthetic Data)
 
-<h3>Assembly Line</h3>
+#### Assembly Line
   * assembly-v1 (Weibull)
