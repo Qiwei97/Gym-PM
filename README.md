@@ -12,7 +12,7 @@ cd Gym-PM
 pip install -e .
 ```
 
-### Environments
+## Environments
 
 #### Rolling Stock
   * rail-v1 (Weibull)
