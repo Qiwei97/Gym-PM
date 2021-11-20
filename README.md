@@ -15,8 +15,8 @@ pip install -e .
 ## Environments [WIP]
 
 #### Rolling Stock
-  * rail-v1 (Weibull)
-  * rail-v2 (Synthetic Data)
+  * Rail-v1 (Weibull)
+  * Rail-v2 (Synthetic Data)
 
 #### Assembly Line
-  * assembly-v1 (Weibull)
+  * Assembly-v1 (Weibull)
