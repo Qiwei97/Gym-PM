@@ -2,7 +2,7 @@ import pandas as pd
 
 def load_data(Type='PdM1'):
 
-    file_path = 'gym_pm/data/' + Type + '.csv'
+    file_path = 'Gym-PM/gym_pm/data/' + Type + '.csv'
     df = pd.read_csv(file_path)
 
     if Type == 'PdM1':
