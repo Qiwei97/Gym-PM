@@ -1,4 +1,4 @@
-# Gym-PM
+# Gym-PM [WIP]
 
 This is a Gym RL Environment for Predictive Maintenance.
 
