@@ -1,4 +1,4 @@
-# Gym-PM [WIP]
+# Gym-PM 
 
 This is a Gym RL Environment for Predictive Maintenance.
 
@@ -12,7 +12,7 @@ cd Gym-PM
 pip install -e .
 ```
 
-## Environments
+## Environments [WIP]
 
 #### Rolling Stock
   * rail-v1 (Weibull)
