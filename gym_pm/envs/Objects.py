@@ -1,6 +1,6 @@
 # Import Modules
 import numpy as np
-from utils import load_data
+from gym_pm.utils import load_data
 from reliability.Distributions import Weibull_Distribution
 
 class Train:
