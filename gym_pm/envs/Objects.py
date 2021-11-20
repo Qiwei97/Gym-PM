@@ -1,5 +1,6 @@
 # Import Modules
 import numpy as np
+from utils import load_data
 from reliability.Distributions import Weibull_Distribution
 
 class Train:
@@ -42,6 +43,38 @@ class Train:
         self.repair_counter += 1
         self.working = 1
         self.age = 0
+        self.repair_status = 1
+
+
+class Train_v2:
+
+    def __init__(self, repair_cost=30, data='PdM1'):
+
+        self.working = 1
+
+        # Cost elements
+        self.repair_cost = repair_cost
+
+        self.repair_counter = 0
+        self.repair_time = 0
+        self.repair_status = 0
+
+        # Data
+        self.df = load_data(data)
+
+    # Deterioration
+    def failure_check(self, time_step):
+
+        # Break down
+        if self.df.iloc[time_step].Failure:
+            self.working = 0
+            return
+        
+    def repair(self):
+
+        self.repair_time = 1
+        self.repair_counter += 1
+        self.working = 1
         self.repair_status = 1
 
 
