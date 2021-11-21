@@ -7,7 +7,7 @@ def load_data(Type='PdM1'):
         Custom dataset must include:
             age: time since last failure
             Failure: 1 = failed, 0 = did not fail
-            ttf: time to next failure (For display purposes, Would not be fed into the model)
+            ttf: time to next failure (For display purposes, would not be fed into the model)
             Date: must be sorted sequentially
     """
 
