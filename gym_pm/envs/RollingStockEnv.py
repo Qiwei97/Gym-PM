@@ -143,6 +143,7 @@ class Railv2_Env(gym.Env):
         obs_bound['high'] = self.machine.df.max()
         obs_bound['low'] = self.machine.df.min()
         obs_bound = obs_bound.to_dict(orient='index')
+        obs_bound.pop('ttf')
 
         obs_space = {}
         for i, j in obs_bound.items():
@@ -167,6 +168,7 @@ class Railv2_Env(gym.Env):
     def observation(self):
         
         state = self.machine.df.iloc[self.time_step].to_dict()
+        state.pop('ttf')
         state = {i: np.array([j], dtype='float32') for (i, j) in state.items()}
 
         return state
@@ -223,14 +225,14 @@ class Railv2_Env(gym.Env):
     def render(self, mode="console"):
 
         if mode == "console":
-            result = pd.DataFrame(self.observation())
+            result = self.machine.df.iloc[self.time_step][['age', 'ttf', 'Failure']]
 
-            result['age'] = result['age'].astype(int)
             result.Failure = result.Failure.astype(bool)
             result['repair_count'] = self.machine.repair_counter
             result['reward'] = self.get_reward()
             result['time_step'] = int(self.time_step)
             result['duration'] = int(self.timer)
+            result = result.to_frame('Results')
             
             clear_output(wait=True)
             display(result)
@@ -238,4 +240,3 @@ class Railv2_Env(gym.Env):
 
     def close(self):
         pass
-    
