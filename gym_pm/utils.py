@@ -122,3 +122,21 @@ def evaluate_baseline(eval_env, duration=100,
         
     return np.sum(total_reward)
 
+
+def evaluate_policy(eval_env, trainer,
+                    duration=100, display=False):
+    
+    total_reward = []
+    obs = eval_env.reset()
+    
+    for i in range(duration):
+
+        action = trainer.compute_action(obs)
+        obs, reward, done, info = eval_env.step(action)
+        total_reward.append(reward)
+
+        if display:
+            eval_env.render()
+        
+    return np.sum(total_reward)
+    
