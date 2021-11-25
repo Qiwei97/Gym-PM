@@ -127,7 +127,7 @@ class Rail_Env(gym.Env):
 class Railv2_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
-    def __init__(self, env_config=None, data='PdM1'):
+    def __init__(self, env_config=None, data='PdM2'):
 
         # Initialize everything
         self.data = data
