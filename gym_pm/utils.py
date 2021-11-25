@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def load_data(Type='PdM1'):
+def load_data(Type='PdM2'):
 
     """
         Custom dataset must include:
@@ -22,7 +22,6 @@ def load_data(Type='PdM1'):
         df = df.sort_values('Date')
         df = df.drop(columns = ['ID', 'Operator', 'Hours Since Previous Failure', 'Date'])
         df.Failure = df.Failure.apply(lambda x: 0 if x == 'No' else 1)
-        df = df[~((df.age <= 5) & (df.Failure == 1))]
         df.reset_index(drop = True, inplace = True)
 
         # ttf
@@ -36,13 +35,14 @@ def load_data(Type='PdM1'):
         df.ttf = df.ttf.apply(lambda x: x[x >= 0]) # Drop negative values
         df = df[df.ttf.str.len() > 0] # Drop empty lists
         df.ttf = df.ttf.apply(lambda x: x[0])
+        df = df[~(df.age + df.ttf <= 10)]
         df.reset_index(drop = True, inplace = True)
 
     elif Type == 'PdM2':
 
         df['Failure'] = df.Failure_today.apply(lambda x: 0 if x == 'No' else 1)
         df.Date = pd.to_datetime(df.Date)
-        df = df[df.Date > '2017']
+        df = df[df.Date > '2016-06']
         df = df.sort_values('Date')
         df.drop(columns = ['Fail_tomorrow', 'Failure_today', 'Location', 'Date', 
                            'Parameter1_Dir', 'Parameter2_9am', 'Parameter2_3pm'], inplace = True)
@@ -66,7 +66,7 @@ def load_data(Type='PdM1'):
         df.age = df.age.apply(lambda x: x[x < 0]) # Drop positive values
         df = df[df.age.str.len() > 0] # Drop empty lists
         df.age = df.age.apply(lambda x: -x[-1])
-        df = df[~((df.age <= 5) & (df.Failure == 1))]
+        df = df[~(df.age + df.ttf <= 10)]
         df.reset_index(drop = True, inplace = True)
 
     return df
