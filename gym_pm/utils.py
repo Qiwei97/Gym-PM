@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import gridspec
 
 def load_data(Type='PdM2'):
 
@@ -139,4 +141,53 @@ def evaluate_policy(eval_env, trainer,
             eval_env.render()
         
     return np.sum(total_reward)
-    
+
+
+# Adapted from https://www.datahubbs.com/how-to-use-deep-reinforcement-learning-to-improve-your-supply-chain/
+def plot_metrics(results):
+
+    # Unpack values from each iteration
+    rewards = np.hstack([i['hist_stats']['episode_reward'] for i in results])
+
+    pol_loss = []
+    vf_loss = []
+    for i in results:
+    metric = i['info']['learner']['default_policy']['learner_stats']
+    pol_loss.append(metric['policy_loss'])
+    vf_loss.append(metric['vf_loss'])
+
+    p = 100
+    mean_rewards = np.array([np.mean(rewards[i-p:i+1]) 
+                    if i >= p else np.mean(rewards[:i+1]) 
+                    for i, _ in enumerate(rewards)])
+    std_rewards = np.array([np.std(rewards[i-p:i+1])
+                if i >= p else np.std(rewards[:i+1])
+                for i, _ in enumerate(rewards)])
+
+    fig = plt.figure(constrained_layout=True, figsize=(15, 8))
+    gs = fig.add_gridspec(2, 4)
+    ax0 = fig.add_subplot(gs[:, :-2])
+    ax0.fill_between(np.arange(len(mean_rewards)), 
+                    mean_rewards - std_rewards, 
+                    mean_rewards + std_rewards, 
+                    label='Standard Deviation', alpha=0.3)
+    ax0.plot(mean_rewards, label='Mean Rewards')
+    ax0.set_ylabel('Rewards')
+    ax0.set_xlabel('Episode')
+    ax0.set_title('Training Rewards')
+    ax0.legend()
+
+    ax1 = fig.add_subplot(gs[0, 2:])
+    ax1.plot(pol_loss)
+    ax1.set_ylabel('Loss')
+    ax1.set_xlabel('Iteration')
+    ax1.set_title('Policy Loss')
+
+    ax2 = fig.add_subplot(gs[1, 2:])
+    ax2.plot(vf_loss)
+    ax2.set_ylabel('Loss')
+    ax2.set_xlabel('Iteration')
+    ax2.set_title('Value Function Loss')
+
+    plt.show()
+
