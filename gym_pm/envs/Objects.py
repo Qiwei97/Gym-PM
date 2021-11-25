@@ -48,7 +48,7 @@ class Train:
 
 class Train_v2:
 
-    def __init__(self, repair_cost=30, data='PdM1'):
+    def __init__(self, data, repair_cost=30):
 
         self.working = 1
 
@@ -163,3 +163,4 @@ class Factory:
         # Send resupply orders
         self.resupply_list = np.append(self.resupply_list, self.lead_time)
         self.resupply_status = 1
+
