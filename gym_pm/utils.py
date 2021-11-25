@@ -72,3 +72,53 @@ def load_data(Type='PdM2'):
     return df
 
 
+def evaluate_baseline(eval_env, duration=100, 
+                      repair_policy=0, repair_interval=10, 
+                      display=False):
+    
+    """
+        repair_policy
+        
+        0: Repair when failed
+        1: Repair at repair_interval
+    """
+    
+    total_reward = []
+    obs = eval_env.reset()
+    
+    if repair_policy == 0:
+        
+        for i in range(duration):
+
+            if obs['Failure'][0] == 1:
+                action = 0 # Repair
+            else:
+                action = 1
+
+            obs, reward, done, info = eval_env.step(action)
+            total_reward.append(reward)
+
+            if display:
+                eval_env.render()
+                
+    elif repair_policy == 1:
+        
+        for i in range(duration):
+
+            if (obs['Failure'][0] == 1) or obs['age'][0] >= repair_interval:
+                action = 0 # Repair
+            else:
+                action = 1
+
+            obs, reward, done, info = eval_env.step(action)
+            total_reward.append(reward)
+
+            if display:
+                eval_env.render()
+        
+    else:
+        
+        return "Invalid Policy"
+        
+    return np.sum(total_reward)
+
