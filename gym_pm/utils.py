@@ -152,18 +152,18 @@ def plot_metrics(results):
     pol_loss = []
     vf_loss = []
     for i in results:
-    metric = i['info']['learner']['default_policy']['learner_stats']
-    pol_loss.append(metric['policy_loss'])
-    vf_loss.append(metric['vf_loss'])
-
+        metric = i['info']['learner']['default_policy']['learner_stats']
+        pol_loss.append(metric['policy_loss'])
+        vf_loss.append(metric['vf_loss'])
+    
     p = 100
     mean_rewards = np.array([np.mean(rewards[i-p:i+1]) 
                     if i >= p else np.mean(rewards[:i+1]) 
                     for i, _ in enumerate(rewards)])
     std_rewards = np.array([np.std(rewards[i-p:i+1])
-                if i >= p else np.std(rewards[:i+1])
-                for i, _ in enumerate(rewards)])
-
+                    if i >= p else np.std(rewards[:i+1])
+                    for i, _ in enumerate(rewards)])
+    
     fig = plt.figure(constrained_layout=True, figsize=(15, 8))
     gs = fig.add_gridspec(2, 4)
     ax0 = fig.add_subplot(gs[:, :-2])
@@ -176,18 +176,18 @@ def plot_metrics(results):
     ax0.set_xlabel('Episode')
     ax0.set_title('Training Rewards')
     ax0.legend()
-
+    
     ax1 = fig.add_subplot(gs[0, 2:])
     ax1.plot(pol_loss)
     ax1.set_ylabel('Loss')
     ax1.set_xlabel('Iteration')
     ax1.set_title('Policy Loss')
-
+    
     ax2 = fig.add_subplot(gs[1, 2:])
     ax2.plot(vf_loss)
     ax2.set_ylabel('Loss')
     ax2.set_xlabel('Iteration')
     ax2.set_title('Value Function Loss')
-
+    
     plt.show()
 
