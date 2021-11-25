@@ -127,9 +127,10 @@ class Rail_Env(gym.Env):
 class Railv2_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
-    def __init__(self, env_config=None):
+    def __init__(self, env_config=None, data='PdM1'):
 
         # Initialize everything
+        self.data = data
         self.reset()
 
         # Episode length
@@ -161,7 +162,7 @@ class Railv2_Env(gym.Env):
         # reset time_step
         self.time_step = 0
 
-        self.machine = Train_v2()
+        self.machine = Train_v2(self.data)
 
         return self.observation()
 
@@ -240,3 +241,4 @@ class Railv2_Env(gym.Env):
 
     def close(self):
         pass
+
