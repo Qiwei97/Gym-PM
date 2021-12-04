@@ -9,48 +9,38 @@ from IPython.display import display, clear_output
 class Rail_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
-    def __init__(self, env_config=None):
+    def __init__(self, env_config=None, alpha=10):
 
         # Initialize everything
+        self.alpha = alpha
         self.reset()
 
         # Episode length
-        self.max_duration = 60 # max timestep
+        self.max_duration = 1000 # max time
 
         # action space
-        self.action_space = spaces.Discrete(2 * len(self.machines))
+        self.action_space = spaces.Discrete(2)
         # obs space
         self.observation_space = spaces.Dict({
-                "age": spaces.Box(low=0., high=self.max_duration, shape=(len(self.machines),), dtype=np.float32),
-                "condition": spaces.MultiBinary(len(self.machines))
-                # "survival_prob": spaces.Box(low=0., high=1., shape=(len(self.machines),), dtype=np.float32)
+                "age": spaces.Box(low=0., high=self.max_duration, shape=(1,), dtype=np.float32),
+                "Failure": spaces.MultiBinary(1)
                 })
 
     def reset(self):
 
-        # reset time_step
-        self.time_step = 0
+        # reset timer
+        self.timer = 0
 
-        # Prepare Objects (Add more objects as desired)
-        # We use 2 in this example
-        self.machine_a = Train(alpha=10)
-        self.machine_b = Train(alpha=15)
-        self.machines = [self.machine_a, self.machine_b]
+        self.machine = Train(alpha=self.alpha)
 
         return self.observation()
 
     def observation(self):
 
         state = {
-            "age": [],
-            "condition": []
-            # "survival_prob": []
+            "age": [self.machine.age],
+            "Failure": [-(self.machine.working - 1)]
         }
-
-        for machine in self.machines:
-            state['age'].append(machine.age)
-            state['condition'].append(machine.working)
-            # state['survival_prob'].append(machine.survival_prob)
 
         state = {i: np.array(j, dtype='float32') for (i, j) in state.items()}
 
@@ -58,18 +48,19 @@ class Rail_Env(gym.Env):
 
     def get_reward(self):
 
-        reward = 100
-        for machine in self.machines:
-            # Repair Cost
-            reward -= machine.repair_cost * machine.repair_status * machine.repair_time
-            if machine.working == False:
-                reward -= 200
+        reward = 0
+        if self.machine.repair_status == False:
+            reward += 100
+        # Repair Cost
+        reward -= self.machine.repair_cost * self.machine.repair_status * self.machine.repair_time
+        if self.machine.working == False:
+            reward -= 200
 
         return reward
 
     def check_done(self):
 
-        if self.time_step >= self.max_duration:
+        if self.timer >= self.max_duration:
             done = True
         else:
             done = False
@@ -78,23 +69,16 @@ class Rail_Env(gym.Env):
 
     def step(self, action):
 
-        self.time_step += 1
+        # Reset Repair Status
+        self.machine.repair_status = 0
 
-        for machine in self.machines:
-            # Deterioriation
-            machine.failure_check()
-            # Reset Repair Status
-            machine.repair_status = 0
+        # Deterioriation
+        self.machine.failure_check()
 
         # Interactions (Add more as desired)
         if action == 0:
-            self.machine_a.repair()
+            self.machine.repair()
         if action == 1:
-            self.machine_b.repair()
-        if action == 2:
-            self.machine_a.repair()
-            self.machine_b.repair()
-        if action == 3:
             pass
 
         obs = self.observation()
@@ -102,19 +86,22 @@ class Rail_Env(gym.Env):
         done = self.check_done()
         info = {}
 
+        self.timer += 1
+
         return obs, reward, done, info
 
     def render(self, mode="console"):
 
         if mode == "console":
-            result = pd.DataFrame(self.observation())
+            result = pd.Series({i: j[0] for (i, j) in self.observation().items()})
 
             result['age'] = result['age'].astype(int)
-            result.condition = result.condition.astype(bool)
-            result['ttf'] = [machine.ttf[0] for machine in self.machines]
-            result['repair_count'] = [machine.repair_counter for machine in self.machines]
+            result.Failure = result.Failure.astype(bool)
+            result['ttf'] = self.machine.ttf[0]
+            result['repair_count'] = self.machine.repair_counter
             result['reward'] = self.get_reward()
-            result['time'] = int(self.time_step)
+            result['duration'] = int(self.timer)
+            result = result.to_frame('Results')
             
             clear_output(wait=True)
             display(result)
