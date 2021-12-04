@@ -19,7 +19,6 @@ class Train:
 
         # Survival
         self.reliability_dist = Weibull_Distribution(alpha=alpha, beta=5)
-        # self.survival_prob = 1
         self.ttf = np.round(self.reliability_dist.random_samples(1)) # Time to failure
 
     # Deterioration
@@ -32,17 +31,15 @@ class Train:
         
         if self.working:
             self.age += 1
-            # self.survival_prob = self.reliability_dist.SF(self.age)
             
     def repair(self):
 
-        # Random fault types
-        self.repair_time = np.random.randint(low=2, high=5)
-        
         self.ttf = np.round(self.reliability_dist.random_samples(1)) # Time to failure
+        self.age = 0
+        
+        self.repair_time = 1
         self.repair_counter += 1
         self.working = 1
-        self.age = 0
         self.repair_status = 1
 
 
