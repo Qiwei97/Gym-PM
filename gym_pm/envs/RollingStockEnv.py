@@ -48,7 +48,7 @@ class Rail_Env(gym.Env):
 
     def get_reward(self):
 
-        reward = 0
+        reward = 0.
         if self.machine.repair_status == False:
             reward += 100
         # Repair Cost
@@ -163,7 +163,7 @@ class Railv2_Env(gym.Env):
 
     def get_reward(self):
 
-        reward = 0
+        reward = 0.
         if self.machine.repair_status == False:
             reward += 100
         # Repair Cost
