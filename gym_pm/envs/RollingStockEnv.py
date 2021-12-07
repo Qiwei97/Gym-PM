@@ -78,7 +78,7 @@ class Rail_Env(gym.Env):
         # Interactions (Add more as desired)
         if action == 0:
             self.machine.repair()
-        if action == 1:
+        else:
             pass
 
         obs = self.observation()
@@ -195,7 +195,7 @@ class Railv2_Env(gym.Env):
             self.machine.repair()
             # Reset time_step
             self.time_step = np.random.choice(self.machine.df[self.machine.df.age == 1].index)
-        if action == 1:
+        else:
             pass
 
         obs = self.observation()
