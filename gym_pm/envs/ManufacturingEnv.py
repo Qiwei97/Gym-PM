@@ -123,9 +123,9 @@ class Assembly_Env(gym.Env):
         # Interactions (Add more as desired)
         if action == 0:
             self.machine_a.repair()
-        if action == 1:
+        elif action == 1:
             self.machine_a.resupply()
-        if action == 2:
+        else:
             pass
 
         obs = self.observation()
