@@ -123,7 +123,7 @@ class Railv2_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
     def __init__(self, env_config=None, 
-                 data='PdM1', repair_cost=30):
+                 data='PdM2', repair_cost=30):
 
         # Cost elements
         self.repair_cost = repair_cost
