@@ -27,3 +27,4 @@ env = gym.make('Rail-v2')
 
 #### Assembly Line
   * Assembly-v1 (Weibull)
+  * Assembly-v2 (Synthetic Data)
