@@ -162,7 +162,7 @@ class Assemblyv2_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
     def __init__(self, env_config=None, output_rate=2, 
-                 data='PdM1', capacity=20,
+                 data='PdM2', capacity=20,
                  repair_cost=30, resupply_cost=3, 
                  storage_cost=2, resupply_qty=10, 
                  lead_time=3, product_price=75):
