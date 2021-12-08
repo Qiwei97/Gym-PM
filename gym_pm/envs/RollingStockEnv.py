@@ -9,10 +9,16 @@ from IPython.display import display, clear_output
 class Rail_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
-    def __init__(self, env_config=None, alpha=10):
+    def __init__(self, env_config=None, 
+                 alpha=10, beta=5, 
+                 repair_cost=30):
+
+        # Cost elements
+        self.repair_cost = repair_cost
 
         # Initialize everything
         self.alpha = alpha
+        self.beta = beta
         self.reset()
 
         # Episode length
@@ -31,7 +37,9 @@ class Rail_Env(gym.Env):
         # reset timer
         self.timer = 0
 
-        self.machine = Train(alpha=self.alpha)
+        self.machine = Train(alpha=self.alpha,
+                             beta=self.beta,
+                             repair_cost=self.repair_cost)
 
         return self.observation()
 
@@ -114,7 +122,11 @@ class Rail_Env(gym.Env):
 class Railv2_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
-    def __init__(self, env_config=None, data='PdM2'):
+    def __init__(self, env_config=None, 
+                 data='PdM1', repair_cost=30):
+
+        # Cost elements
+        self.repair_cost = repair_cost
 
         # Initialize everything
         self.data = data
@@ -149,7 +161,8 @@ class Railv2_Env(gym.Env):
         # reset time_step
         self.time_step = 0
 
-        self.machine = Train_v2(self.data)
+        self.machine = Train_v2(data=self.data,
+                                repair_cost=self.repair_cost)
 
         return self.observation()
 
@@ -228,4 +241,3 @@ class Railv2_Env(gym.Env):
 
     def close(self):
         pass
-
