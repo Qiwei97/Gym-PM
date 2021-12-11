@@ -17,3 +17,8 @@ register(
     id='Assembly-v1',
     entry_point='gym_pm.envs:Assembly_Env'
 )
+
+register(
+    id='Assembly-v2',
+    entry_point='gym_pm.envs:Assemblyv2_Env'
+)
