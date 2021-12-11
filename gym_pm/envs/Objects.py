@@ -78,20 +78,21 @@ class Train_v2:
 
 class Factory:
 
-    def __init__(self, output_rate, alpha, episode_length,
-                 repair_cost=30, resupply_cost=3, 
-                 storage_cost=2, resupply_qty=10, 
-                 lead_time=3, product_price=75):
+    def __init__(self, output_rate, alpha, 
+                 beta, capacity, episode_length,
+                 repair_cost, resupply_cost, 
+                 storage_cost, resupply_qty, 
+                 lead_time, product_price):
 
-        self.capacity = 20
         self.working = 1
         self.output = 0
 
         # Cost elements
+        self.output_rate = output_rate
+        self.capacity = capacity
         self.repair_cost = repair_cost
         self.resupply_cost = resupply_cost
         self.storage_cost = storage_cost
-        self.output_rate = output_rate
         self.resupply_qty = resupply_qty
         self.lead_time = lead_time
         self.product_price = product_price
@@ -106,8 +107,7 @@ class Factory:
         self.resupply_list = np.array([])
 
         # Survival
-        self.reliability_dist = Weibull_Distribution(alpha=alpha, beta=5)
-        self.survival_prob = 1
+        self.reliability_dist = Weibull_Distribution(alpha=alpha, beta=beta)
         self.ttf = np.round(self.reliability_dist.random_samples(1)) # Time to failure
 
         # Demand
@@ -120,7 +120,7 @@ class Factory:
         if self.capacity < self.output_rate:
             return
 
-        if self.working:
+        if self.working and self.repair_status == 0:
             self.capacity -= self.output_rate
             self.output += self.output_rate
 
@@ -132,28 +132,26 @@ class Factory:
             self.working = 0
             return
         
-        if self.working and self.capacity > 0:
+        if self.working and self.capacity >= self.output_rate:
             self.age += 1
-            self.survival_prob = self.reliability_dist.SF(self.age)
 
     # Update Lead time 
-    def update_LT(self):
+    def update_lt(self):
 
         if len(self.resupply_list) > 0:
-            self.resupply_list -= 1 # Count down
+            self.resupply_list -= 1 # Count down lead time
             # Replenish Stock
             self.capacity += self.resupply_qty * sum(self.resupply_list <= 0)
             self.resupply_list = self.resupply_list[self.resupply_list > 0]
 
     def repair(self):
-
-        # Random fault types
-        self.repair_time = np.random.randint(low=2, high=5)
         
         self.ttf = np.round(self.reliability_dist.random_samples(1)) # Time to failure
+        self.age = 0
+
+        self.repair_time = 1
         self.repair_counter += 1
         self.working = 1
-        self.age = 0
         self.repair_status = 1
 
     def resupply(self):
