@@ -183,7 +183,7 @@ class Assemblyv2_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
     def __init__(self, env_config=None, output_rate=2, 
-                 data='PdM2', capacity=20,
+                 data='PdM2', split='Train', capacity=20,
                  repair_cost=30, resupply_cost=3, 
                  storage_cost=2, resupply_qty=10, 
                  lead_time=3, product_price=75):
@@ -200,6 +200,7 @@ class Assemblyv2_Env(gym.Env):
 
         # Initialize everything
         self.data = data
+        self.split = split
         self.reset()
 
         # Episode length
@@ -239,6 +240,7 @@ class Assemblyv2_Env(gym.Env):
 
         self.machine = Factory_v2(output_rate=self.output_rate, 
                                   data=self.data,
+                                  split=self.split,
                                   capacity=self.capacity,                 
                                   repair_cost=self.repair_cost, 
                                   resupply_cost=self.resupply_cost,
@@ -337,7 +339,7 @@ class Assemblyv2_Env(gym.Env):
 
         return obs, reward, done, info
 
-    def render(self, mode="console"):
+    def render(self, mode='console'):
 
         result = self.machine.df.iloc[self.time_step][['age', 'ttf', 'Failure']]
 
