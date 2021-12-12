@@ -46,7 +46,7 @@ class Train:
 
 class Train_v2:
 
-    def __init__(self, data, repair_cost):
+    def __init__(self, data, split, repair_cost):
 
         self.working = 1
 
@@ -58,7 +58,7 @@ class Train_v2:
         self.repair_status = 0
 
         # Data
-        self.df = load_data(data)
+        self.df = load_data(data, split)
 
     # Deterioration
     def failure_check(self, time_step):
@@ -164,7 +164,7 @@ class Factory:
 class Factory_v2:
 
     def __init__(self, output_rate,
-                 data, capacity,
+                 data, split, capacity,
                  repair_cost, resupply_cost, 
                  storage_cost, resupply_qty, 
                  lead_time, product_price):
@@ -191,7 +191,7 @@ class Factory_v2:
         self.resupply_list = np.array([])
 
         # Data
-        self.df = load_data(data)
+        self.df = load_data(data, split)
 
         # Demand
         self.df['demand'] = np.random.poisson(2, len(self.df))
@@ -236,4 +236,3 @@ class Factory_v2:
         # Send resupply orders
         self.resupply_list = np.append(self.resupply_list, self.lead_time)
         self.resupply_status = 1
-
