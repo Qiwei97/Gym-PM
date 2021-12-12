@@ -44,7 +44,7 @@ def load_data(Type='PdM2'):
 
         df['Failure'] = df.Failure_today.apply(lambda x: 0 if x == 'No' else 1)
         df.Date = pd.to_datetime(df.Date)
-        df = df[df.Date > '2016-06']
+        # df = df[df.Date > '2016-06']
         df = df.sort_values('Date')
         df.drop(columns = ['Fail_tomorrow', 'Failure_today', 'Location', 'Date', 
                            'Parameter1_Dir', 'Parameter2_9am', 'Parameter2_3pm'], inplace = True)
