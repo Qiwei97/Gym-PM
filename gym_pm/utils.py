@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 
-def load_data(Type='PdM2'):
+def load_data(Type='PdM2', split='Train'):
 
     """
         Custom dataset must include:
@@ -44,7 +44,15 @@ def load_data(Type='PdM2'):
 
         df['Failure'] = df.Failure_today.apply(lambda x: 0 if x == 'No' else 1)
         df.Date = pd.to_datetime(df.Date)
-        # df = df[df.Date > '2016-06']
+
+        cutoff = '2016-10'
+        if split == 'Train':
+            df = df[df.Date < cutoff]
+        elif split == 'Test':
+            df = df = df[df.Date >= cutoff]
+        elif split == None:
+            pass
+
         df = df.sort_values('Date')
         df.drop(columns = ['Fail_tomorrow', 'Failure_today', 'Location', 'Date', 
                            'Parameter1_Dir', 'Parameter2_9am', 'Parameter2_3pm'], inplace = True)
@@ -131,12 +139,16 @@ def evaluate_policy(eval_env, trainer,
     
     obs = eval_env.reset()
     df_result = pd.DataFrame(obs)
-    action_list = []
-    reward_list = []
+    action_list, reward_list, ttf_list = [], [], []
     
     if RNN == False:
 
         for i in range(duration):
+            
+            if display:
+                eval_env.render('human')
+            else:
+                ttf = eval_env.render('console').loc['ttf'].values[0]
 
             action = trainer.compute_action(obs)
             obs, reward, done, info = eval_env.step(action)
@@ -144,9 +156,7 @@ def evaluate_policy(eval_env, trainer,
             df_result = df_result.append(pd.DataFrame(obs), ignore_index=True)
             reward_list.append(reward)
             action_list.append(action)
-
-            if display:
-                eval_env.render()
+            ttf_list.append(ttf)             
                 
     else:
         
@@ -154,6 +164,11 @@ def evaluate_policy(eval_env, trainer,
         state = trainer.get_policy().model.get_initial_state()
 
         for i in range(duration):
+            
+            if display:
+                eval_env.render('human')
+            else:
+                ttf = eval_env.render('console').loc['ttf'].values[0]
 
             action, state, logit = trainer.compute_action(obs, prev_action=1.0,
                                                           prev_reward=0.0, state=state)
@@ -162,13 +177,12 @@ def evaluate_policy(eval_env, trainer,
             df_result = df_result.append(pd.DataFrame(obs), ignore_index=True)
             reward_list.append(reward)
             action_list.append(action)
-            
-            if display:
-                eval_env.render()
+            ttf_list.append(ttf)    
     
     df_result = df_result[:-1]
     df_result['action'] = action_list
     df_result['reward'] = reward_list
+    df_result['ttf'] = ttf_list
     
     return df_result
 
