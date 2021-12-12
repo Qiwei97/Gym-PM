@@ -129,8 +129,10 @@ def evaluate_policy(eval_env, trainer,
                     duration=100, RNN=False,
                     display=False):
     
-    total_reward = []
     obs = eval_env.reset()
+    df_result = pd.DataFrame(obs)
+    action_list = []
+    reward_list = []
     
     if RNN == False:
 
@@ -138,14 +140,17 @@ def evaluate_policy(eval_env, trainer,
 
             action = trainer.compute_action(obs)
             obs, reward, done, info = eval_env.step(action)
-            total_reward.append(reward)
+            
+            df_result = df_result.append(pd.DataFrame(obs), ignore_index=True)
+            reward_list.append(reward)
+            action_list.append(action)
 
             if display:
                 eval_env.render()
                 
     else:
         
-        # If use LSTM or Attention Mechanism
+        # If use LSTM
         state = trainer.get_policy().model.get_initial_state()
 
         for i in range(duration):
@@ -153,12 +158,19 @@ def evaluate_policy(eval_env, trainer,
             action, state, logit = trainer.compute_action(obs, prev_action=1.0,
                                                           prev_reward=0.0, state=state)
             obs, reward, done, info = eval_env.step(action)
-            total_reward.append(reward)
+            
+            df_result = df_result.append(pd.DataFrame(obs), ignore_index=True)
+            reward_list.append(reward)
+            action_list.append(action)
             
             if display:
                 eval_env.render()
-        
-    return np.sum(total_reward)
+    
+    df_result = df_result[:-1]
+    df_result['action'] = action_list
+    df_result['reward'] = reward_list
+    
+    return df_result
 
 
 # Adapted from https://www.datahubbs.com/how-to-use-deep-reinforcement-learning-to-improve-your-supply-chain/
