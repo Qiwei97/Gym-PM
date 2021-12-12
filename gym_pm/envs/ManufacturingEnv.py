@@ -155,22 +155,25 @@ class Assembly_Env(gym.Env):
 
     def render(self, mode="console"):
 
-        if mode == "console":
-            result = pd.Series({i: j[0] for (i, j) in self.observation().items()})
+        result = pd.Series({i: j[0] for (i, j) in self.observation().items()})
 
-            result['age'] = result['age'].astype(int)
-            result.Failure = result.Failure.astype(bool)
-            result['ttf'] = self.machine.ttf[0]
-            result['repair_count'] = self.machine.repair_counter
-            result['reward'] = self.get_reward()
-            result['duration'] = int(self.timer)
-            result['lead_time'] = self.machine.resupply_list
-            result['backlog'] = self.backlog
-            result = result.to_frame('Results')
+        result['age'] = result['age'].astype(int)
+        result.Failure = result.Failure.astype(bool)
+        result['ttf'] = self.machine.ttf[0]
+        result['repair_count'] = self.machine.repair_counter
+        result['reward'] = self.get_reward()
+        result['duration'] = int(self.timer)
+        result['lead_time'] = self.machine.resupply_list
+        result['backlog'] = self.backlog
+        result = result.to_frame('Results')
             
+        if mode == 'human':
+
             clear_output(wait=True)
             display(result)
             time.sleep(1)
+
+        return result
 
     def close(self):
         pass
@@ -336,22 +339,25 @@ class Assemblyv2_Env(gym.Env):
 
     def render(self, mode="console"):
 
-        if mode == "console":
-            result = self.machine.df.iloc[self.time_step][['age', 'ttf', 'Failure']]
+        result = self.machine.df.iloc[self.time_step][['age', 'ttf', 'Failure']]
 
-            result.Failure = result.Failure.astype(bool)
-            result['resources'] = round(self.machine.capacity, 2)
-            result['repair_count'] = self.machine.repair_counter
-            result['reward'] = self.get_reward()
-            result['time_step'] = int(self.time_step)
-            result['duration'] = int(self.timer)
-            result['lead_time'] = self.machine.resupply_list
-            result['backlog'] = self.backlog
-            result = result.to_frame('Results')
+        result.Failure = result.Failure.astype(bool)
+        result['resources'] = round(self.machine.capacity, 2)
+        result['repair_count'] = self.machine.repair_counter
+        result['reward'] = self.get_reward()
+        result['time_step'] = int(self.time_step)
+        result['duration'] = int(self.timer)
+        result['lead_time'] = self.machine.resupply_list
+        result['backlog'] = self.backlog
+        result = result.to_frame('Results')
             
+        if mode == 'human':
+
             clear_output(wait=True)
             display(result)
             time.sleep(1)
+
+        return result
             
     def close(self):
         pass
