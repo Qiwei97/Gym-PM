@@ -125,14 +125,15 @@ class Rail_Env(gym.Env):
 class Railv2_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
-    def __init__(self, env_config=None, 
-                 data='PdM2', repair_cost=30):
+    def __init__(self, env_config=None, data='PdM2', 
+                 split='Train', repair_cost=30):
 
         # Cost elements
         self.repair_cost = repair_cost
 
         # Initialize everything
         self.data = data
+        self.split = split
         self.reset()
 
         # Episode length
@@ -165,6 +166,7 @@ class Railv2_Env(gym.Env):
         self.time_step = 0
 
         self.machine = Train_v2(data=self.data,
+                                split=self.split,
                                 repair_cost=self.repair_cost)
 
         return self.observation()
@@ -226,7 +228,7 @@ class Railv2_Env(gym.Env):
 
         return obs, reward, done, info
 
-    def render(self, mode="console"):
+    def render(self, mode='console'):
 
         result = self.machine.df.iloc[self.time_step][['age', 'ttf', 'Failure']]
 
