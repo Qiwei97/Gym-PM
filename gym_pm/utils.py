@@ -47,7 +47,7 @@ def load_data(Type='PdM2', split='Train'):
 
         cutoff = '2016-10'
         if split == 'Train':
-            df = df[(df.Date > '2014-06') & (df.Date < cutoff)]
+            df = df[(df.Date > '2015') & (df.Date < cutoff)]
         elif split == 'Test':
             df = df = df[df.Date >= cutoff]
         elif split == None:
