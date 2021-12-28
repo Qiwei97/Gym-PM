@@ -11,6 +11,8 @@ def load_data(Type='PdM2', split='Train'):
             Failure: 1 = failed, 0 = did not fail
             ttf: time to next failure (For display purposes, would not be fed into the model)
             Date: must be sorted sequentially
+        
+        Splits: Train, Test, None
     """
 
     file_path = 'Gym-PM/gym_pm/data/' + Type + '.csv'
@@ -52,6 +54,8 @@ def load_data(Type='PdM2', split='Train'):
             df = df[df.Date >= cutoff]
         elif split == None:
             pass
+        else:
+            return("Invalid Split")
 
         df = df.sort_values('Date')
         df.drop(columns = ['Fail_tomorrow', 'Failure_today', 'Location', 'Date', 
