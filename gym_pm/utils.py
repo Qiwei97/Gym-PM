@@ -55,7 +55,7 @@ def load_data(Type='PdM2', split='Train'):
         elif split == None:
             pass
         else:
-            return("Invalid Split")
+            return "Invalid Split"
 
         df = df.sort_values('Date')
         df.drop(columns = ['Fail_tomorrow', 'Failure_today', 'Location', 'Date', 
