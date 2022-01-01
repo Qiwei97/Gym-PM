@@ -111,7 +111,7 @@ class Factory:
         self.ttf = np.round(self.reliability_dist.random_samples(1)) # Time to failure
 
         # Demand
-        self.demand_dist = np.random.poisson(2, episode_length)
+        self.demand_dist = np.random.poisson(2, episode_length + 1)
         self.fulfilled_orders = 0
     
     # Resource Usage
