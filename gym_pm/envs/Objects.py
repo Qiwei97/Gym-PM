@@ -194,7 +194,7 @@ class Factory_v2:
         self.df = load_data(data, split)
 
         # Demand
-        self.df['demand'] = np.random.poisson(2, len(self.df))
+        self.demand_dist = np.random.poisson(2, len(self.df) + 1)
         self.fulfilled_orders = 0
     
     # Resource Usage
