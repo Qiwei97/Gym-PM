@@ -289,7 +289,7 @@ class Assemblyv2_Env(gym.Env):
 
     def fulfil_demand(self):
 
-        self.backlog += self.machine.df.iloc[self.time_step]['demand']
+        self.backlog += self.machine.demand_dist[self.timer]
 
         if self.machine.output == 0:
             return
