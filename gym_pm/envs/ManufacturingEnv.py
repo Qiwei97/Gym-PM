@@ -34,7 +34,7 @@ class Assembly_Env(gym.Env):
         self.beta = beta
         self.reset()
 
-        self.max_resource = self.machine.output_rate * 1000 # Set to a high value
+        self.max_resource = max(self.machine.output_rate * 1000, 5000) # Set to a high value
 
         # action space
         self.action_space = spaces.Discrete(3)
@@ -205,7 +205,7 @@ class Assemblyv2_Env(gym.Env):
 
         # Episode length
         self.max_duration = len(self.machine.df) # max time
-        self.max_resource = self.machine.output_rate * 1000 # Set to a high value
+        self.max_resource = max(self.machine.output_rate * 1000, 5000) # Set to a high value
 
         # action space
         self.action_space = spaces.Discrete(3)
