@@ -49,7 +49,7 @@ def load_data(Type='PdM2', split='Train'):
 
         cutoff = '2016-10'
         if split == 'Train':
-            df = df[(df.Date > '2015') & (df.Date < cutoff)]
+            df = df[(df.Date > '2015-03') & (df.Date < cutoff)]
         elif split == 'Test':
             df = df[df.Date >= cutoff]
         elif split == None:
@@ -58,30 +58,32 @@ def load_data(Type='PdM2', split='Train'):
             return "Invalid Split"
 
         df = df.sort_values('Date')
-        df.drop(columns = ['Fail_tomorrow', 'Failure_today', 'Location', 'Date', 
-                           'Parameter1_Dir', 'Parameter2_9am', 'Parameter2_3pm'], inplace = True)
+        df.drop(columns = ['Fail_tomorrow', 'Failure_today', 'Parameter1_Dir', 
+                           'Parameter2_9am', 'Parameter2_3pm'], inplace = True)
         df.fillna(0, inplace = True)
         df.reset_index(drop = True, inplace = True)
 
         # ttf
-        failure_time = np.array(sorted(df[df.Failure == 1].index.tolist()))
-        failure_list = []
-        for i in range(len(df)):
-            failure_list.append(failure_time)
+        failure_time = df.groupby(['Location', 'Date']).Failure.first() 
+        failure_time = failure_time[failure_time == 1].reset_index() # Collect failure dates
+        failure_time = failure_time.groupby('Location').Date.apply(np.array)
+        failure_time = failure_time.reset_index()
 
-        df['ttf'] = failure_list
-        df.ttf = df.ttf - df.index
+        failure_time.rename(columns = {"Date": "ttf"}, inplace = True)
+        df = df.merge(failure_time, how = 'inner', on = 'Location')
         df['age'] = df.ttf
-        df.ttf = df.ttf.apply(lambda x: x[x >= 0]) # Drop negative values
+
+        df.ttf = df.apply(lambda x: x['ttf'][x['ttf'] >= x['Date']], axis = 1)
         df = df[df.ttf.str.len() > 0] # Drop empty lists
-        df.ttf = df.ttf.apply(lambda x: x[0])
+        df.ttf = df.apply(lambda x: (x['ttf'][0] - x['Date']).days, axis = 1) # Calculate TTF
 
         # age
-        df.age = df.age.apply(lambda x: x[x < 0]) # Drop positive values
+        df.age = df.apply(lambda x: x['age'][x['age'] < x['Date']], axis = 1)
         df = df[df.age.str.len() > 0] # Drop empty lists
-        df.age = df.age.apply(lambda x: -x[-1])
+        df.age = df.apply(lambda x: (x['Date'] - x['age'][-1]).days, axis = 1) # Calculate Age
         df = df[~(df.age + df.ttf <= 10)]
         df.reset_index(drop = True, inplace = True)
+        df.drop(columns = ['Date', 'Location'], inplace = True)
 
     return df
 
