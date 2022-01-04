@@ -225,7 +225,7 @@ def evaluate_policy(eval_env, trainer,
         for i in range(duration):
             
             if display:
-                eval_env.render('human')
+                ttf = eval_env.render('human').loc['ttf'].values[0]
             else:
                 ttf = eval_env.render('console').loc['ttf'].values[0]
 
@@ -250,7 +250,7 @@ def evaluate_policy(eval_env, trainer,
         for i in range(duration):
             
             if display:
-                eval_env.render('human')
+                ttf = eval_env.render('human').loc['ttf'].values[0]
             else:
                 ttf = eval_env.render('console').loc['ttf'].values[0]
 
