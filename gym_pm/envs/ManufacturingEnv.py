@@ -27,7 +27,7 @@ class Assembly_Env(gym.Env):
         self.product_price = product_price
 
         # Episode length
-        self.max_duration = 1000 # max time
+        self.max_duration = 3000 # max time
 
         # Initialize everything
         self.alpha = alpha
