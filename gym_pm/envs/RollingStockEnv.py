@@ -22,7 +22,7 @@ class Rail_Env(gym.Env):
         self.reset()
 
         # Episode length
-        self.max_duration = 1000 # max time
+        self.max_duration = 3000 # max time
 
         # action space
         self.action_space = spaces.Discrete(2)
