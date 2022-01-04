@@ -204,7 +204,7 @@ def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10,
         print("Invalid Env Type. Must be either Rail or Assembly.")
         return
         
-    return np.sum(total_reward) / duration
+    return np.mean(total_reward)
 
 
 def evaluate_policy(eval_env, trainer,
