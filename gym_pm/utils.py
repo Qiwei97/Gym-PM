@@ -88,8 +88,9 @@ def load_data(Type='PdM2', split='Train'):
     return df
 
 
-def evaluate_baseline(eval_env, duration=100, 
-                      repair_policy=0, repair_interval=10, 
+def evaluate_baseline(eval_env, env_name, repair_policy=0, 
+                      repair_interval=10, duration=None,
+                      resupply_threshold=None, backlog_threshold=100,
                       display=False):
     
     """
@@ -97,46 +98,116 @@ def evaluate_baseline(eval_env, duration=100,
         
         0: Repair when failed
         1: Repair at repair_interval
+        
+        env_name: Must contain Rail or Assembly
+        
+        Assembly_Env: Resupply triggered according to the resupply_threshold and backlog_threshold
     """
+    
+    if duration == None:
+        duration = eval_env.max_duration
+        
+    assert duration <= eval_env.max_duration
+    assert repair_interval < duration
     
     total_reward = []
     obs = eval_env.reset()
     
-    if repair_policy == 0:
+    # Rail Env
+    if 'Rail' in env_name:
+    
+        if repair_policy == 0:
+
+            for i in range(duration):
+
+                if obs['Failure'][0] == 1:
+                    action = 0 # Repair
+                else:
+                    action = 1 # Do Nothing
+
+                obs, reward, done, info = eval_env.step(action)
+                total_reward.append(reward)
+
+                if display:
+                    eval_env.render('human')
+
+        elif repair_policy == 1:
+
+            for i in range(duration):
+
+                if (obs['Failure'][0] == 1) or (obs['age'][0] >= repair_interval):
+                    action = 0 # Repair
+                else:
+                    action = 1 # Do Nothing
+
+                obs, reward, done, info = eval_env.step(action)
+                total_reward.append(reward)
+
+                if display:
+                    eval_env.render('human')
+
+        else:
+
+            print("Invalid Policy")
+            return
         
-        for i in range(duration):
-
-            if obs['Failure'][0] == 1:
-                action = 0 # Repair
-            else:
-                action = 1
-
-            obs, reward, done, info = eval_env.step(action)
-            total_reward.append(reward)
-
-            if display:
-                eval_env.render()
-                
-    elif repair_policy == 1:
+    # Assembly Env
+    elif 'Assembly' in env_name:
         
-        for i in range(duration):
+        if resupply_threshold == None:
+            resupply_threshold = eval_env.resupply_qty
+    
+        if repair_policy == 0:
 
-            if (obs['Failure'][0] == 1) or obs['age'][0] >= repair_interval:
-                action = 0 # Repair
-            else:
-                action = 1
+            for i in range(duration):
 
-            obs, reward, done, info = eval_env.step(action)
-            total_reward.append(reward)
+                if obs['Failure'][0] == 1:
+                    action = 0 # Repair
+                elif (obs['resources'][0] <= resupply_threshold) or (obs['backlog'][0] >= backlog_threshold):
+                    if len(eval_env.machine.resupply_list) == 0:
+                        action = 1 # Resupply
+                    else:
+                        action = 2 # Do Nothing
+                else:
+                    action = 2 # Do Nothing                    
+                    
+                obs, reward, done, info = eval_env.step(action)
+                total_reward.append(reward)
 
-            if display:
-                eval_env.render()
+                if display:
+                    eval_env.render('human')
+
+        elif repair_policy == 1:
+
+            for i in range(duration):
+
+                if (obs['Failure'][0] == 1) or (obs['age'][0] >= repair_interval):
+                    action = 0 # Repair
+                elif (obs['resources'][0] <= resupply_threshold) or (obs['backlog'][0] >= backlog_threshold):
+                    if len(eval_env.machine.resupply_list) == 0:
+                        action = 1 # Resupply
+                    else:
+                        action = 2 # Do Nothing
+                else:
+                    action = 2 # Do Nothing
+                    
+                obs, reward, done, info = eval_env.step(action)
+                total_reward.append(reward)
+
+                if display:
+                    eval_env.render('human')
+
+        else:
+
+            print("Invalid Policy")
+            return
         
     else:
         
-        return "Invalid Policy"
+        print("Invalid Env Name. Must contain either Rail or Assembly.")
+        return
         
-    return np.sum(total_reward)
+    return np.sum(total_reward) / duration
 
 
 def evaluate_policy(eval_env, trainer,
