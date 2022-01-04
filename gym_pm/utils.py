@@ -208,8 +208,13 @@ def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10,
 
 
 def evaluate_policy(eval_env, trainer,
-                    duration=100, RNN=False,
+                    duration=None, RNN=False,
                     display=False):
+    
+    if duration == None:
+        duration = eval_env.max_duration
+        
+    assert duration <= eval_env.max_duration
     
     obs = eval_env.reset()
     df_result = pd.DataFrame(obs)
@@ -236,6 +241,11 @@ def evaluate_policy(eval_env, trainer,
         
         # If use LSTM
         state = trainer.get_policy().model.get_initial_state()
+        
+        if 'Rail' in str(eval_env):
+            action, reward = 1.0, 0.0
+        elif 'Assembly' in str(eval_env):
+            action, reward = 2.0, 0.0
 
         for i in range(duration):
             
@@ -244,8 +254,8 @@ def evaluate_policy(eval_env, trainer,
             else:
                 ttf = eval_env.render('console').loc['ttf'].values[0]
 
-            action, state, logit = trainer.compute_action(obs, prev_action=1.0,
-                                                          prev_reward=0.0, state=state)
+            action, state, logit = trainer.compute_action(obs, prev_action=action,
+                                                          prev_reward=reward, state=state)
             obs, reward, done, info = eval_env.step(action)
             
             df_result = df_result.append(pd.DataFrame(obs), ignore_index=True)
