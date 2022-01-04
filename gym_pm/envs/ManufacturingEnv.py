@@ -6,7 +6,6 @@ import pandas as pd
 from gym_pm.envs.Objects import Factory, Factory_v2
 from IPython.display import display, clear_output
 
-
 class Assembly_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
