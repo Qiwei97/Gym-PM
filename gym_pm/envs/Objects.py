@@ -25,13 +25,13 @@ class Train:
     # Deterioration
     def failure_check(self):
 
+        if self.working:
+            self.age += 1
+
         # Break down
         if self.age >= self.ttf:
             self.working = 0
             return
-        
-        if self.working:
-            self.age += 1
             
     def repair(self):
 
@@ -126,14 +126,14 @@ class Factory:
 
     # Deterioration
     def failure_check(self):
+        
+        if self.working and self.capacity >= self.output_rate:
+            self.age += 1
 
         # Break down
         if self.age >= self.ttf:
             self.working = 0
             return
-        
-        if self.working and self.capacity >= self.output_rate:
-            self.age += 1
 
     # Update Lead time 
     def update_lt(self):
