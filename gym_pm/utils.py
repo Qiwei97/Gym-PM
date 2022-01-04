@@ -88,18 +88,15 @@ def load_data(Type='PdM2', split='Train'):
     return df
 
 
-def evaluate_baseline(eval_env, env_name, repair_policy=0, 
-                      repair_interval=10, duration=None,
-                      resupply_threshold=None, backlog_threshold=100,
-                      display=False):
+def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10, 
+                      duration=None, resupply_threshold=None, 
+                      backlog_threshold=20, display=False):
     
     """
         repair_policy
         
         0: Repair when failed
         1: Repair at repair_interval
-        
-        env_name: Must contain Rail or Assembly
         
         Assembly_Env: Resupply triggered according to the resupply_threshold and backlog_threshold
     """
@@ -114,7 +111,7 @@ def evaluate_baseline(eval_env, env_name, repair_policy=0,
     obs = eval_env.reset()
     
     # Rail Env
-    if 'Rail' in env_name:
+    if 'Rail' in str(eval_env):
     
         if repair_policy == 0:
 
@@ -152,7 +149,7 @@ def evaluate_baseline(eval_env, env_name, repair_policy=0,
             return
         
     # Assembly Env
-    elif 'Assembly' in env_name:
+    elif 'Assembly' in str(eval_env):
         
         if resupply_threshold == None:
             resupply_threshold = eval_env.resupply_qty
@@ -204,7 +201,7 @@ def evaluate_baseline(eval_env, env_name, repair_policy=0,
         
     else:
         
-        print("Invalid Env Name. Must contain either Rail or Assembly.")
+        print("Invalid Env Type. Must be either Rail or Assembly.")
         return
         
     return np.sum(total_reward) / duration
