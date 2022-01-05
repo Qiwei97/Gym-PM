@@ -1,7 +1,10 @@
 # Import Modules
 import numpy as np
+import pandas as pd
 from gym_pm.utils import load_data
 from reliability.Distributions import Weibull_Distribution
+from timeseries_generator.external_factors import CountryGdpFactor, EUIndustryProductFactor
+from timeseries_generator import Generator, HolidayFactor, SinusoidalFactor, WeekdayFactor, WhiteNoise
 
 class Train:
 
@@ -111,7 +114,24 @@ class Factory:
         self.ttf = np.round(self.reliability_dist.random_samples(1)) # Time to failure
 
         # Demand
-        self.demand_dist = np.random.poisson(2, episode_length + 1)
+        self.demand_dist = Generator(factors = {CountryGdpFactor(),
+                                                EUIndustryProductFactor(),
+                                                HolidayFactor(holiday_factor = 1.5),
+                                                WeekdayFactor(
+                                                    factor_values = {4: 1.05, 5: 1.15, 6: 1.15}  
+                                                ), # Here we assign a factor of 1.05 to Friday, and 1.15 to Sat/Sun
+                                                SinusoidalFactor(wavelength = 365, 
+                                                                amplitude = 0.2, 
+                                                                phase = 365/4, 
+                                                                mean = 1),
+                                                WhiteNoise(stdev_factor = 0.05)},
+                                    features = {"country": ["Netherlands"],
+                                                "store": ["store1"],
+                                                "product": ["winter jacket"]},
+                                    date_range = pd.date_range(start = '2010', periods = (episode_length + 1), freq = 'D'),
+                                    base_value = 5)
+                                    
+        self.demand_dist = round(self.demand_dist.generate()['value']).values
         self.fulfilled_orders = 0
     
     # Resource Usage
@@ -194,7 +214,24 @@ class Factory_v2:
         self.df = load_data(data, split)
 
         # Demand
-        self.demand_dist = np.random.poisson(2, len(self.df) + 1)
+        self.demand_dist = Generator(factors = {CountryGdpFactor(),
+                                                EUIndustryProductFactor(),
+                                                HolidayFactor(holiday_factor = 1.5),
+                                                WeekdayFactor(
+                                                    factor_values = {4: 1.05, 5: 1.15, 6: 1.15}  
+                                                ), # Here we assign a factor of 1.05 to Friday, and 1.15 to Sat/Sun
+                                                SinusoidalFactor(wavelength = 365, 
+                                                                amplitude = 0.2, 
+                                                                phase = 365/4, 
+                                                                mean = 1),
+                                                WhiteNoise(stdev_factor = 0.05)},
+                                    features = {"country": ["Netherlands"],
+                                                "store": ["store1"],
+                                                "product": ["winter jacket"]},
+                                    date_range = pd.date_range(start = '2010', periods = (len(self.df) + 1), freq = 'D'),
+                                    base_value = 5)
+                                    
+        self.demand_dist = round(self.demand_dist.generate()['value']).values
         self.fulfilled_orders = 0
     
     # Resource Usage
