@@ -1,2 +1,2 @@
-reliability == 0.7.1
+reliability == 0.5.7
 timeseries_generator == 0.1.0
