@@ -217,25 +217,20 @@ def evaluate_policy(eval_env, trainer,
     assert duration <= eval_env.max_duration
     
     obs = eval_env.reset()
-    df_result = pd.DataFrame(obs)
-    action_list, reward_list, ttf_list = [], [], []
+    action_list, obs_list = [], []
     
     if RNN == False:
 
-        for i in range(duration):
-            
-            if display:
-                ttf = eval_env.render('human').loc['ttf'].values[0]
-            else:
-                ttf = eval_env.render('console').loc['ttf'].values[0]
+        for i in range(duration):                
 
             action = trainer.compute_action(obs)
             obs, reward, done, info = eval_env.step(action)
             
-            df_result = df_result.append(pd.DataFrame(obs), ignore_index=True)
-            reward_list.append(reward)
             action_list.append(action)
-            ttf_list.append(ttf)             
+            if display:
+                obs_list.append(eval_env.render('human').to_dict()['Results'])
+            else:
+                obs_list.append(eval_env.render('console').to_dict()['Results'])           
                 
     else:
         
@@ -248,25 +243,19 @@ def evaluate_policy(eval_env, trainer,
             action, reward = 2.0, 0.0
 
         for i in range(duration):
-            
-            if display:
-                ttf = eval_env.render('human').loc['ttf'].values[0]
-            else:
-                ttf = eval_env.render('console').loc['ttf'].values[0]
 
             action, state, logit = trainer.compute_action(obs, prev_action=action,
                                                           prev_reward=reward, state=state)
             obs, reward, done, info = eval_env.step(action)
-            
-            df_result = df_result.append(pd.DataFrame(obs), ignore_index=True)
-            reward_list.append(reward)
+
             action_list.append(action)
-            ttf_list.append(ttf)    
+            if display:
+                obs_list.append(eval_env.render('human').to_dict()['Results'])
+            else:
+                obs_list.append(eval_env.render('console').to_dict()['Results'])
     
-    df_result = df_result[:-1]
+    df_result = pd.DataFrame(obs_list)
     df_result['action'] = action_list
-    df_result['reward'] = reward_list
-    df_result['ttf'] = ttf_list
     
     return df_result
 
