@@ -90,7 +90,7 @@ def load_data(Type='PdM2', split='Train'):
 
 def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10, 
                       duration=None, resupply_threshold=None, 
-                      backlog_threshold=20, display=False):
+                      backlog_threshold=None, display=False):
     
     """
         repair_policy
@@ -107,8 +107,8 @@ def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10,
     assert duration <= eval_env.max_duration
     assert repair_interval < duration
     
-    total_reward = []
     obs = eval_env.reset()
+    action_list, obs_list = [], []
     
     # Rail Env
     if 'Rail' in str(eval_env):
@@ -123,10 +123,12 @@ def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10,
                     action = 1 # Do Nothing
 
                 obs, reward, done, info = eval_env.step(action)
-                total_reward.append(reward)
-
+                    
+                action_list.append(action)
                 if display:
-                    eval_env.render('human')
+                    obs_list.append(eval_env.render('human').to_dict()['Results'])
+                else:
+                    obs_list.append(eval_env.render('console').to_dict()['Results'])
 
         elif repair_policy == 1:
 
@@ -138,10 +140,12 @@ def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10,
                     action = 1 # Do Nothing
 
                 obs, reward, done, info = eval_env.step(action)
-                total_reward.append(reward)
-
+                
+                action_list.append(action)
                 if display:
-                    eval_env.render('human')
+                    obs_list.append(eval_env.render('human').to_dict()['Results'])
+                else:
+                    obs_list.append(eval_env.render('console').to_dict()['Results'])
 
         else:
 
@@ -153,6 +157,8 @@ def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10,
         
         if resupply_threshold == None:
             resupply_threshold = eval_env.resupply_qty
+        if backlog_threshold == None:
+            backlog_threshold = eval_env.machine.demand_dist.sum()
     
         if repair_policy == 0:
 
@@ -169,10 +175,12 @@ def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10,
                     action = 2 # Do Nothing                    
                     
                 obs, reward, done, info = eval_env.step(action)
-                total_reward.append(reward)
-
+                
+                action_list.append(action)
                 if display:
-                    eval_env.render('human')
+                    obs_list.append(eval_env.render('human').to_dict()['Results'])
+                else:
+                    obs_list.append(eval_env.render('console').to_dict()['Results'])
 
         elif repair_policy == 1:
 
@@ -189,10 +197,12 @@ def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10,
                     action = 2 # Do Nothing
                     
                 obs, reward, done, info = eval_env.step(action)
-                total_reward.append(reward)
-
+                
+                action_list.append(action)
                 if display:
-                    eval_env.render('human')
+                    obs_list.append(eval_env.render('human').to_dict()['Results'])
+                else:
+                    obs_list.append(eval_env.render('console').to_dict()['Results'])
 
         else:
 
@@ -203,8 +213,11 @@ def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10,
         
         print("Invalid Env Type. Must be either Rail or Assembly.")
         return
-        
-    return np.mean(total_reward)
+    
+    df_result = pd.DataFrame(obs_list)
+    df_result['action'] = action_list
+    
+    return df_result
 
 
 def evaluate_policy(eval_env, trainer,
