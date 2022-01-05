@@ -9,7 +9,7 @@ from IPython.display import display, clear_output
 class Assembly_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
-    def __init__(self, env_config=None, output_rate=2, 
+    def __init__(self, env_config=None, output_rate=7, 
                  alpha=10, beta=5, capacity=20,
                  repair_cost=30, resupply_cost=3, 
                  storage_cost=2, resupply_qty=10, 
@@ -181,7 +181,7 @@ class Assembly_Env(gym.Env):
 class Assemblyv2_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
-    def __init__(self, env_config=None, output_rate=2, 
+    def __init__(self, env_config=None, output_rate=7, 
                  data='PdM2', split='Train', capacity=20,
                  repair_cost=30, resupply_cost=3, 
                  storage_cost=2, resupply_qty=10, 
