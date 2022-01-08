@@ -333,7 +333,7 @@ class Assemblyv2_Env(gym.Env):
 
         self.timer += 1
 
-        if self.machine.working:
+        if (self.machine.working) and (self.machine.repair_status == 0):
             self.time_step += 1
 
         return obs, reward, done, info
