@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 
-def load_data(Type='PdM2', split='Train'):
+def load_data(Type='PdM2', split='Train', save=True):
 
     """
         Custom dataset must include:
@@ -52,8 +52,8 @@ def load_data(Type='PdM2', split='Train'):
             df = df[(df.Date > '2015-03') & (df.Date < cutoff)]
         elif split == 'Test':
             df = df[df.Date >= cutoff]
-        elif split == None:
-            pass
+        elif split == 'All':
+            df = df[df.Date > '2015-03']
         else:
             return "Invalid Split"
 
@@ -85,7 +85,23 @@ def load_data(Type='PdM2', split='Train'):
         df.reset_index(drop = True, inplace = True)
         df.drop(columns = ['Date', 'Location'], inplace = True)
 
+        # Save data as pickle
+        if save:
+            df.to_pickle(file_path.replace('.csv', '_' + split + '.pkl'))
+
     return df
+
+
+def update_boundaries(data='PdM2', save=True,
+                      file_path='Gym-PM/gym_pm/data/'):
+
+    obs_bound = pd.DataFrame()
+    df = load_data(data, split='All', save=False)
+    obs_bound['high'] = df.max()
+    obs_bound['low'] = df.min()
+
+    if save:
+        obs_bound.to_pickle(file_path + data + '_Bound.pkl')
 
 
 def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10, 
