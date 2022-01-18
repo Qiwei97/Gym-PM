@@ -185,7 +185,8 @@ class Assemblyv2_Env(gym.Env):
                  data='PdM2', split='Train', capacity=35,
                  repair_cost=30, resupply_cost=3, 
                  storage_cost=2, resupply_qty=28, 
-                 lead_time=3, product_price=75):
+                 lead_time=3, product_price=75,
+                 file_path='Gym-PM/gym_pm/data/'):
 
         # Cost elements
         self.output_rate = output_rate
@@ -200,6 +201,7 @@ class Assemblyv2_Env(gym.Env):
         # Initialize everything
         self.data = data
         self.split = split
+        self.file_path = file_path
         self.reset()
 
         # Episode length
@@ -210,9 +212,7 @@ class Assemblyv2_Env(gym.Env):
         self.action_space = spaces.Discrete(3)
 
         # obs space
-        obs_bound = pd.DataFrame()
-        obs_bound['high'] = self.machine.df.max()
-        obs_bound['low'] = self.machine.df.min()
+        obs_bound = pd.read_pickle(self.file_path + data + '_Bound.pkl')
         obs_bound = obs_bound.to_dict(orient='index')
         obs_bound.pop('ttf')
 
@@ -246,7 +246,8 @@ class Assemblyv2_Env(gym.Env):
                                   storage_cost=self.storage_cost, 
                                   resupply_qty=self.resupply_qty,
                                   lead_time=self.lead_time, 
-                                  product_price=self.product_price)
+                                  product_price=self.product_price,
+                                  file_path=self.file_path)
 
         return self.observation()
 
