@@ -126,7 +126,8 @@ class Railv2_Env(gym.Env):
     metadata = {"render.modes": ["console"]}
 
     def __init__(self, env_config=None, data='PdM2', 
-                 split='Train', repair_cost=30):
+                 split='Train', repair_cost=30,
+                 file_path='Gym-PM/gym_pm/data/'):
 
         # Cost elements
         self.repair_cost = repair_cost
@@ -134,6 +135,7 @@ class Railv2_Env(gym.Env):
         # Initialize everything
         self.data = data
         self.split = split
+        self.file_path = file_path
         self.reset()
 
         # Episode length
@@ -143,9 +145,7 @@ class Railv2_Env(gym.Env):
         self.action_space = spaces.Discrete(2)
 
         # obs space
-        obs_bound = pd.DataFrame()
-        obs_bound['high'] = self.machine.df.max()
-        obs_bound['low'] = self.machine.df.min()
+        obs_bound = pd.read_pickle(self.file_path + data + '_Bound.pkl')
         obs_bound = obs_bound.to_dict(orient='index')
         obs_bound.pop('ttf')
 
@@ -167,7 +167,8 @@ class Railv2_Env(gym.Env):
 
         self.machine = Train_v2(data=self.data,
                                 split=self.split,
-                                repair_cost=self.repair_cost)
+                                repair_cost=self.repair_cost,
+                                file_path=self.file_path)
 
         return self.observation()
 
