@@ -49,7 +49,8 @@ class Train:
 
 class Train_v2:
 
-    def __init__(self, data, split, repair_cost):
+    def __init__(self, data, split, 
+                 repair_cost, file_path):
 
         self.working = 1
 
@@ -61,7 +62,10 @@ class Train_v2:
         self.repair_status = 0
 
         # Data
-        self.df = load_data(data, split)
+        try:
+            self.df = pd.read_pickle(file_path + data + "_" + split + ".pkl")
+        except:
+            print('Data not found. Please run the load_data function.')
 
     # Deterioration
     def failure_check(self, time_step):
@@ -183,11 +187,11 @@ class Factory:
 
 class Factory_v2:
 
-    def __init__(self, output_rate,
-                 data, split, capacity,
-                 repair_cost, resupply_cost, 
-                 storage_cost, resupply_qty, 
-                 lead_time, product_price):
+    def __init__(self, output_rate, data, 
+                 split, capacity, repair_cost, 
+                 resupply_cost, storage_cost, 
+                 resupply_qty, lead_time, 
+                 product_price, file_path):
 
         self.working = 1
         self.output = 0
@@ -211,7 +215,10 @@ class Factory_v2:
         self.resupply_list = np.array([])
 
         # Data
-        self.df = load_data(data, split)
+        try:
+            self.df = pd.read_pickle(file_path + data + "_" + split + ".pkl")
+        except:
+            print('Data not found. Please run the load_data function.')
 
         # Demand
         self.demand_dist = Generator(factors = {CountryGdpFactor(),
