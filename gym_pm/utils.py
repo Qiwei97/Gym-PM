@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 
-def load_data(Type='PdM2', split='Train', save=True):
+def create_data(Type='PdM2', split='Train', save=True):
 
     """
         Custom dataset must include:
@@ -92,16 +92,21 @@ def load_data(Type='PdM2', split='Train', save=True):
     return df
 
 
-def update_boundaries(data='PdM2', save=True,
+def update_boundaries(Type='PdM2', save=True,
                       file_path='Gym-PM/gym_pm/data/'):
 
     obs_bound = pd.DataFrame()
-    df = load_data(data, split='All', save=False)
+    df = create_data(Type, split='All', save=False)
     obs_bound['high'] = df.max()
     obs_bound['low'] = df.min()
 
     if save:
         obs_bound.to_pickle(file_path + data + '_Bound.pkl')
+
+
+def load_data(file_path, data, split):
+
+    return pd.read_pickle(file_path + data + "_" + split + ".pkl")
 
 
 def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10, 
