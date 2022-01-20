@@ -101,7 +101,7 @@ def update_boundaries(Type='PdM2', save=True,
     obs_bound['low'] = df.min()
 
     if save:
-        obs_bound.to_pickle(file_path + data + '_Bound.pkl')
+        obs_bound.to_pickle(file_path + Type + '_Bound.pkl')
 
 
 def load_data(file_path, data, split):
