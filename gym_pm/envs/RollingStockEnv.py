@@ -3,6 +3,7 @@ from gym import spaces
 import time
 import numpy as np
 import pandas as pd
+from gym_pm.utils import load_data
 from gym_pm.envs.Objects import Train, Train_v2
 from IPython.display import display, clear_output
 
@@ -145,7 +146,7 @@ class Railv2_Env(gym.Env):
         self.action_space = spaces.Discrete(2)
 
         # obs space
-        obs_bound = pd.read_pickle(self.file_path + data + '_Bound.pkl')
+        obs_bound = load_data(self.file_path, data, 'Bound')
         obs_bound = obs_bound.to_dict(orient='index')
         obs_bound.pop('ttf')
 
