@@ -63,9 +63,9 @@ class Train_v2:
 
         # Data
         try:
-            self.df = pd.read_pickle(file_path + data + "_" + split + ".pkl")
+            self.df = load_data(file_path, data, split)
         except:
-            print('Data not found. Please run the load_data function.')
+            print('Data not found. Please run the create_data function.')
 
     # Deterioration
     def failure_check(self, time_step):
@@ -216,9 +216,9 @@ class Factory_v2:
 
         # Data
         try:
-            self.df = pd.read_pickle(file_path + data + "_" + split + ".pkl")
+            self.df = load_data(file_path, data, split)
         except:
-            print('Data not found. Please run the load_data function.')
+            print('Data not found. Please run the create_data function.')
 
         # Demand
         self.demand_dist = Generator(factors = {CountryGdpFactor(),
