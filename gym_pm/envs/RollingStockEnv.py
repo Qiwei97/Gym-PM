@@ -232,7 +232,10 @@ class Railv2_Env(gym.Env):
 
     def render(self, mode='console'):
 
-        result = self.machine.df.iloc[self.time_step][['age', 'ttf', 'Failure']]
+        if (self.machine.working) and (self.machine.repair_status == 0):
+            result = self.machine.df.iloc[self.time_step - 1][['age', 'ttf', 'Failure']]
+        else:
+            result = self.machine.df.iloc[self.time_step][['age', 'ttf', 'Failure']]
 
         result.Failure = result.Failure.astype(bool)
         result['repair_count'] = self.machine.repair_counter
