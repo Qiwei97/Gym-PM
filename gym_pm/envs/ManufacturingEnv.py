@@ -186,10 +186,9 @@ class Assemblyv2_Env(gym.Env):
 
     def __init__(self, env_config=None, output_rate=7, 
                  data='PdM2', split='Train', capacity=35,
-                 repair_cost=30, resupply_cost=3, 
-                 storage_cost=2, resupply_qty=28, 
-                 lead_time=3, product_price=75,
-                 file_path='Gym-PM/gym_pm/data/'):
+                 repair_cost=30, resupply_cost=3, storage_cost=2, 
+                 backlog_cost=10, resupply_qty=28, lead_time=3, 
+                 product_price=75, file_path='Gym-PM/gym_pm/data/'):
 
         # Cost elements
         self.output_rate = output_rate
@@ -197,6 +196,7 @@ class Assemblyv2_Env(gym.Env):
         self.repair_cost = repair_cost
         self.resupply_cost = resupply_cost
         self.storage_cost = storage_cost
+        self.backlog_cost = backlog_cost
         self.resupply_qty = resupply_qty
         self.lead_time = lead_time
         self.product_price = product_price
@@ -274,6 +274,8 @@ class Assemblyv2_Env(gym.Env):
         # Inventory Cost
         reward -= self.machine.capacity * self.machine.storage_cost
         reward -= self.machine.output * self.machine.storage_cost
+        # Backlog Cost
+        reward -= self.backlog * self.backlog_cost
         # Sales Revenue
         reward += self.machine.fulfilled_orders * self.machine.product_price
         if self.machine.working == False:
@@ -295,7 +297,7 @@ class Assemblyv2_Env(gym.Env):
         self.backlog += self.machine.demand_dist[self.timer]
 
         if self.machine.output == 0:
-            return
+            self.machine.fulfilled_orders = 0
         elif self.backlog > self.machine.output:
             self.backlog -= self.machine.output
             self.machine.fulfilled_orders = self.machine.output
@@ -355,7 +357,7 @@ class Assemblyv2_Env(gym.Env):
         result['reward'] = self.get_reward()
         result['time_step'] = int(self.time_step)
         result['duration'] = int(self.timer)
-        result['lead_time'] = self.machine.resupply_list
+        result['lead_time'] = self.machine.resupply_list.copy()
         result['backlog'] = self.backlog
         result = result.to_frame('Results')
             
