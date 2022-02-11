@@ -109,9 +109,9 @@ def load_data(file_path, data, split):
     return pd.read_pickle(file_path + data + "_" + split + ".pkl")
 
 
-def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10, 
-                      duration=None, resupply_threshold=None, 
-                      backlog_threshold=None, display=False):
+def evaluate_baseline(eval_env, repair_policy=0, 
+                      repair_interval=10, duration=None, 
+                      resupply_threshold=None, display=False):
     
     """
         repair_policy
@@ -178,8 +178,6 @@ def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10,
         
         if resupply_threshold == None:
             resupply_threshold = eval_env.resupply_qty
-        if backlog_threshold == None:
-            backlog_threshold = eval_env.machine.demand_dist.sum()
     
         if repair_policy == 0:
 
@@ -187,7 +185,7 @@ def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10,
 
                 if obs['Failure'][0] == 1:
                     action = 0 # Repair
-                elif (obs['resources'][0] <= resupply_threshold) or (obs['backlog'][0] >= backlog_threshold):
+                elif ((obs['resources'][0] <= resupply_threshold) and (obs['backlog'][0] > obs['output'][0])):
                     if len(eval_env.machine.resupply_list) == 0:
                         action = 1 # Resupply
                     else:
@@ -209,7 +207,7 @@ def evaluate_baseline(eval_env, repair_policy=0, repair_interval=10,
 
                 if (obs['Failure'][0] == 1) or (obs['age'][0] >= repair_interval):
                     action = 0 # Repair
-                elif (obs['resources'][0] <= resupply_threshold) or (obs['backlog'][0] >= backlog_threshold):
+                elif ((obs['resources'][0] <= resupply_threshold) and (obs['backlog'][0] > obs['output'][0])):
                     if len(eval_env.machine.resupply_list) == 0:
                         action = 1 # Resupply
                     else:
