@@ -135,10 +135,6 @@ class Assembly_Env(gym.Env):
         self.machine.update_lt()
         # Deterioriation
         self.machine.failure_check()
-        # Inventory
-        self.machine.update_inv()
-        # Reduce Backlog
-        self.fulfil_demand()
 
         # Interactions (Add more as desired)
         if action == 0:
@@ -147,6 +143,11 @@ class Assembly_Env(gym.Env):
             self.machine.resupply()
         else:
             pass
+
+        # Inventory
+        self.machine.update_inv()
+        # Reduce Backlog
+        self.fulfil_demand()
 
         obs = self.observation()
         reward = self.get_reward()
@@ -320,10 +321,6 @@ class Assemblyv2_Env(gym.Env):
         self.machine.update_lt()
         # Deterioriation
         self.machine.failure_check(self.time_step)
-        # Inventory
-        self.machine.update_inv()
-        # Reduce Backlog
-        self.fulfil_demand()
 
         # Interactions (Add more as desired)
         if action == 0:
@@ -334,6 +331,11 @@ class Assemblyv2_Env(gym.Env):
             self.machine.resupply()
         else:
             pass
+
+        # Inventory
+        self.machine.update_inv()
+        # Reduce Backlog
+        self.fulfil_demand()
 
         obs = self.observation()
         reward = self.get_reward()
