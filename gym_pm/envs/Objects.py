@@ -128,14 +128,15 @@ class Factory:
                                                                 amplitude = 0.2, 
                                                                 phase = 365/4, 
                                                                 mean = 1),
-                                                WhiteNoise(stdev_factor = 0.05)},
+                                                WhiteNoise(stdev_factor = 0.3)},
                                     features = {"country": ["Netherlands"],
                                                 "store": ["store1"],
                                                 "product": ["winter jacket"]},
                                     date_range = pd.date_range(start = '2010', periods = (episode_length + 1), freq = 'D'),
-                                    base_value = 5)
-                                    
-        self.demand_dist = round(self.demand_dist.generate()['value']).values
+                                    base_value = 4).generate()
+               
+        self.demand_dist[self.demand_dist.value < 0] = 0
+        self.demand_dist = round(self.demand_dist['value']).values
         self.fulfilled_orders = 0
     
     # Resource Usage
@@ -231,14 +232,15 @@ class Factory_v2:
                                                                 amplitude = 0.2, 
                                                                 phase = 365/4, 
                                                                 mean = 1),
-                                                WhiteNoise(stdev_factor = 0.05)},
+                                                WhiteNoise(stdev_factor = 0.3)},
                                     features = {"country": ["Netherlands"],
                                                 "store": ["store1"],
                                                 "product": ["winter jacket"]},
                                     date_range = pd.date_range(start = '2010', periods = (len(self.df) + 1), freq = 'D'),
-                                    base_value = 5)
-                                    
-        self.demand_dist = round(self.demand_dist.generate()['value']).values
+                                    base_value = 4).generate()
+               
+        self.demand_dist[self.demand_dist.value < 0] = 0
+        self.demand_dist = round(self.demand_dist['value']).values
         self.fulfilled_orders = 0
     
     # Resource Usage
