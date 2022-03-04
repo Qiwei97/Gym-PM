@@ -44,7 +44,8 @@ class Assembly_Env(gym.Env):
                 "Failure": spaces.MultiBinary(1),
                 "resources": spaces.Box(low=0., high=self.max_resource, shape=(1,), dtype=np.float32),
                 "backlog": spaces.Box(low=0., high=self.max_resource, shape=(1,), dtype=np.float32),
-                "output": spaces.Box(low=0., high=self.max_resource, shape=(1,), dtype=np.float32)
+                "output": spaces.Box(low=0., high=self.max_resource, shape=(1,), dtype=np.float32),
+                "resupply_queue": spaces.Box(low=0., high=self.max_resource, shape=(1,), dtype=np.float32)
                 })
 
     def reset(self):
@@ -75,7 +76,8 @@ class Assembly_Env(gym.Env):
             "Failure": [-(self.machine.working - 1)],
             "resources": [self.machine.capacity],
             "backlog": [self.backlog],
-            "output": [self.machine.output]
+            "output": [self.machine.output],
+            "resupply_queue": [len(self.machine.resupply_list)]
         }
 
         state = {i: np.array(j, dtype='float32') for (i, j) in state.items()}
@@ -231,6 +233,7 @@ class Assemblyv2_Env(gym.Env):
         obs_space['backlog'] = spaces.Box(low=0., high=self.max_resource, shape=(1,), dtype=np.float32)
         obs_space['output'] = spaces.Box(low=0., high=self.max_resource, shape=(1,), dtype=np.float32)
         obs_space['resources'] = spaces.Box(low=0., high=self.max_resource, shape=(1,), dtype=np.float32)
+        obs_space['resupply_queue'] = spaces.Box(low=0., high=self.max_resource, shape=(1,), dtype=np.float32)
 
         self.observation_space = spaces.Dict(obs_space)
 
@@ -263,6 +266,7 @@ class Assemblyv2_Env(gym.Env):
         state['backlog'] = self.backlog
         state['output'] = self.machine.output
         state['resources'] = self.machine.capacity
+        state['resupply_queue'] = len(self.machine.resupply_list)
         state.pop('ttf')
         state = {i: np.array([j], dtype='float32') for (i, j) in state.items()}
 
@@ -365,6 +369,7 @@ class Assemblyv2_Env(gym.Env):
         result['lead_time'] = self.machine.resupply_list.copy()
         result['backlog'] = self.backlog
         result['output'] = self.machine.output
+        result['resupply_queue'] = len(self.machine.resupply_list)
         result = result.to_frame('Results')
             
         if mode == 'human':
