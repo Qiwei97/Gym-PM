@@ -37,7 +37,7 @@ class Assembly_Env(gym.Env):
         self.max_resource = self.max_duration * max(output_rate, resupply_qty) + self.machine.demand_dist.sum() # Set to a high value
 
         # action space
-        self.action_space = spaces.Discrete(3)
+        self.action_space = spaces.Discrete(4)
         # obs space
         self.observation_space = spaces.Dict({
                 "age": spaces.Box(low=0., high=self.max_duration, shape=(1,), dtype=np.float32),
@@ -143,11 +143,12 @@ class Assembly_Env(gym.Env):
             self.machine.repair()
         elif action == 1:
             self.machine.resupply()
+            self.machine.update_inv()
+        elif action == 2:
+            self.machine.update_inv()
         else:
             pass
 
-        # Inventory
-        self.machine.update_inv()
         # Reduce Backlog
         self.fulfil_demand()
 
@@ -216,7 +217,7 @@ class Assemblyv2_Env(gym.Env):
         self.max_resource = self.max_duration * max(output_rate, resupply_qty) + self.machine.demand_dist.sum() # Set to a high value
 
         # action space
-        self.action_space = spaces.Discrete(3)
+        self.action_space = spaces.Discrete(4)
 
         # obs space
         obs_bound = load_data(self.file_path, data, 'Bound')
@@ -333,11 +334,12 @@ class Assemblyv2_Env(gym.Env):
             self.time_step = np.random.choice(self.machine.df[self.machine.df.age == 1].index)
         elif action == 1:
             self.machine.resupply()
+            self.machine.update_inv()
+        elif action == 2:
+            self.machine.update_inv()
         else:
             pass
 
-        # Inventory
-        self.machine.update_inv()
         # Reduce Backlog
         self.fulfil_demand()
 
