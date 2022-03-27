@@ -19,7 +19,7 @@ import gym_pm
 env = gym.make('Rail-v2')
 ```
 
-## Environments [WIP]
+## Environments
 
 #### Rolling Stock
   * Rail-v1 (Weibull)
